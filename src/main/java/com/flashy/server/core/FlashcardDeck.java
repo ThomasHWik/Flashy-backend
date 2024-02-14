@@ -2,6 +2,7 @@ package com.flashy.server.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 public class FlashcardDeck {
 
@@ -16,13 +17,13 @@ public class FlashcardDeck {
         return name;
     }
 
-    public void addCard(String question, String answer) {
-        this.cards.add(new Flashcard(question, answer));
+    public void addCard(String question, String answer, int cardID) {
+        this.cards.add(new Flashcard(question, answer, cardID));
     }
 
-    public void removeCard(String question) {
+    public void removeCard(int cardID) {
         for (Flashcard card : cards) {
-            if (card.getQuestion().equals(question)) {
+            if (card.getCardID() == cardID) {
                 this.cards.remove(card);
                 break;
             }
@@ -31,6 +32,16 @@ public class FlashcardDeck {
 
     public List<Flashcard> getCards() {
         return cards;
+    }
+
+    public void swapCards(int index1, int index2) {
+        Flashcard tempIndex1 = cards.get((index1));
+        cards.set(index1, cards.get(index2));
+        cards.set(index2, tempIndex1);
+    }
+
+    public void shuffleCards() {
+        Collections.shuffle(cards);
     }
 
 }
