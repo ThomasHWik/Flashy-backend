@@ -22,7 +22,7 @@ public class FlashyuserController {
     private FlashyuserService flashyuserService;
 
 
-    @PostMapping("/registrer")
+    @PostMapping("/register")
     public ResponseEntity<String> registrerUser(@RequestBody UserDTO user) {
         System.out.println(user);
         try {
