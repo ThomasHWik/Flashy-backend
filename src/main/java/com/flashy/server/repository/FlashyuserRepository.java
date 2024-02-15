@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 @Component
 public interface FlashyuserRepository extends JpaRepository<Flashyuser, Long> {
         Flashyuser getFirstByUsername(String username);
+
+        Flashyuser getById(int id);
 }

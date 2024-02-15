@@ -25,6 +25,7 @@ public class Flashyuser {
     public Flashyuser() {
 
     }
+
     public Flashyuser(int id, String username, String password, int isadmin) {
         this.id = id;
         this.username = username;

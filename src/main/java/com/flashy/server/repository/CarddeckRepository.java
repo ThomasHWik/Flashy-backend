@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Component
 public interface CarddeckRepository extends JpaRepository<Carddeck, Long> {
+        Carddeck getFirstByUuid(String uuid);
 
 }

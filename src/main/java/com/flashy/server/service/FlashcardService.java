@@ -1,5 +1,7 @@
 package com.flashy.server.service;
 
+import com.flashy.server.core.CarddeckDTO;
+import com.flashy.server.core.FlashcardDTO;
 import com.flashy.server.core.FlashcardDeck;
 import com.flashy.server.data.Carddeck;
 import com.flashy.server.data.Flashcard;
@@ -10,6 +12,7 @@ import com.flashy.server.repository.FlashyuserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,5 +48,17 @@ public class FlashcardService {
             }
 
 
+    }
+
+    public CarddeckDTO getCarddeck(String uuid) {
+            Carddeck deck = carddeckRepository.getFirstByUuid(uuid);
+            if (deck != null) {
+                List<Flashcard> cards = flashcardRepository.findAllByCarddeckId(deck.getId());
+                System.out.println(cards.size());
+                List<FlashcardDTO> dtocards = cards.stream().map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid())).toList();
+                Flashyuser user = flashyuserRepository.getById(deck.getFlashyuser_id());
+                return new CarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(), user != null ? user.getUsername() : "");
+            }
+            return null;
     }
 }
