@@ -1,8 +1,9 @@
-CREATE TABLE user
+CREATE TABLE flashyuser
 (
     id       INT         NOT NULL PRIMARY KEY IDENTITY(1,1),
     username varchar(55) NOT NULL UNIQUE,
-    isadmin  BIT
+    isadmin  BIT,
+    password varchar(55)
 )
 
 CREATE TABLE category
@@ -18,7 +19,7 @@ CREATE TABLE carddeck
     title     VARCHAR(55) NOT NULL,
     isprivate BIT         NOT NULL,
     user_id   INT         NOT NULL,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES user (id)
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES flashyuser (id)
 )
 
 
@@ -36,7 +37,7 @@ CREATE TABLE flashcard
 CREATE TABLE user_has_like
 (
     user_id     INT NOT NULL,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES user (id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES flashyuser (id),
     carddeck_id INT NOT NULL,
     CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id)
 )
@@ -53,7 +54,7 @@ CREATE TABLE carddeck_has_category
 CREATE TABLE user_has_favourite
 (
     user_id     INT NOT NULL,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES user (id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES flashyuser (id),
     carddeck_id INT NOT NULL,
     CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id),
 )
@@ -65,5 +66,5 @@ CREATE TABLE comment
     carddeck_id INT NOT NULL,
     CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id),
     user_id     INT,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES user (id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES flashyuser (id),
 )
