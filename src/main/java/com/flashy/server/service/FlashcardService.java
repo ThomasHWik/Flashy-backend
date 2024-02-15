@@ -35,7 +35,7 @@ public class FlashcardService {
     }
 
     public boolean createCarddeck(FlashcardDeck flashcardDeck) {
-        try {
+
             Flashyuser user = flashyuserRepository.getFirstByUsername(flashcardDeck.getUsername());
             if (user == null) {
                 return false;
@@ -44,10 +44,6 @@ public class FlashcardService {
                 return createFlashcards(flashcardDeck, id);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
 
     }
 }
