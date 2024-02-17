@@ -15,6 +15,7 @@ public class FlashcardDeck {
     private List<FlashcardDTO> cards;
     private String uuid;
     private int isprivate;
+    private String username;
 
     public FlashcardDeck() {
 
@@ -24,11 +25,12 @@ public class FlashcardDeck {
     public FlashcardDeck(String name) {
         this.name = name;
     }
-    public FlashcardDeck (String name, List<FlashcardDTO> cards, int isprivate, String uuid) {
+    public FlashcardDeck (String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username) {
         this.name = name;
         this.cards = cards;
         this.uuid = uuid;
         this.isprivate = isprivate;
+        this.username = username;
     }
 
 

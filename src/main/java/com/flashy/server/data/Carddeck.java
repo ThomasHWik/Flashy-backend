@@ -23,19 +23,25 @@ public class Carddeck {
     @NotBlank
     private int isprivate;
 
+    @NotBlank
+    private int flashyuser_id;
+
+
     public Carddeck() {
 
     }
-    public Carddeck(int id, String uuid, String title, int isprivate) {
+    public Carddeck(int id, String uuid, String title, int isprivate, int flashyuser_id) {
         this.id = id;
         this.uuid = uuid;
         this.title = title;
         this.isprivate = isprivate;
+        this.flashyuser_id = flashyuser_id;
     }
 
-    public Carddeck(String uuid, String title, int isprivate) {
+    public Carddeck(String uuid, String title, int isprivate, int flashyuser_id) {
         this.uuid = uuid;
         this.title = title;
         this.isprivate = isprivate;
+        this.flashyuser_id = flashyuser_id;
     }
 }
