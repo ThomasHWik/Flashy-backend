@@ -3,7 +3,7 @@ CREATE TABLE flashyuser
     id       INT         NOT NULL PRIMARY KEY IDENTITY(1,1),
     username varchar(55) NOT NULL UNIQUE,
     isadmin  BIT,
-    password varchar(55)
+    password varchar(255)
 )
 
 CREATE TABLE category
