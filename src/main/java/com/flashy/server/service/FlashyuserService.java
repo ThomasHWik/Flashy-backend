@@ -1,5 +1,6 @@
 package com.flashy.server.service;
 
+import com.flashy.server.core.User;
 import com.flashy.server.core.UserDTO;
 import com.flashy.server.data.Flashyuser;
 import com.flashy.server.exceptions.InvalidLoginException;
@@ -27,11 +28,27 @@ public class FlashyuserService {
     public int registrerUser(UserDTO user) throws InvalidLoginException {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(user.getUsername());
         if (dbUser == null) {
-            Flashyuser savedUser = flashyuserRepository.save(new Flashyuser(user.getUsername(), hashingService.hashPassword(user.getPassword()), user.getIsadmin()));
+            Flashyuser savedUser = flashyuserRepository.save(new Flashyuser(user.getUsername(), hashingService.hashPassword(user.getPassword()), 0));
             return savedUser.getIsadmin();
         } else {
             throw new InvalidLoginException();
 
+        }
+    }
+
+    public boolean registerAdmin(UserDTO user, String authUsername) throws InvalidLoginException  {
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(authUsername);
+
+        if (requestingUser != null && requestingUser.getIsadmin() == 1) {
+            Flashyuser dbUser = flashyuserRepository.getFirstByUsername(user.getUsername());
+            if (dbUser == null) {
+                flashyuserRepository.save(new Flashyuser(user.getUsername(), hashingService.hashPassword(user.getPassword()), 1));
+                return true;
+            } else {
+                throw new InvalidLoginException();
+            }
+        } else {
+            return false;
         }
     }
 }
