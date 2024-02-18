@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 @Component
@@ -21,4 +23,7 @@ public interface FlashyuserRepository extends JpaRepository<Flashyuser, Long> {
         @Query("DELETE FROM Flashyuser x WHERE x.username = :username")
         void deleteByUsername(String username);
 
+        @Query("SELECT x FROM Flashyuser x WHERE x.isadmin = 1")
+
+        List<Flashyuser> findWhereIsAdmin();
 }

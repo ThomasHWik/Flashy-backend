@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class FlashyuserService {
 
@@ -85,4 +87,12 @@ public class FlashyuserService {
         }
     }
 
+    public List<String> getAllAdmins(String username) {
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(username);
+        if (requestingUser != null && requestingUser.getIsadmin() == 1) {
+            return flashyuserRepository.findWhereIsAdmin().stream().map(x -> x.getUsername()).toList();
+        } else {
+            return null;
+        }
+    }
 }

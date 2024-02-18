@@ -114,6 +114,23 @@ public class FlashyuserController {
         }
     }
 
+    @GetMapping("/admin/getall")
+    public ResponseEntity<List<String>> getAllAdmins(@RequestHeader("Authorization") final String token) {
+        try {
+            String username = jwtService.getUsernameFromToken(token.substring(7));
+            List<String> usernames = flashyuserService.getAllAdmins(username);
+            if (usernames != null) {
+                return new ResponseEntity<>(usernames, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 
