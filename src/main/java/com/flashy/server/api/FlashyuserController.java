@@ -91,11 +91,28 @@ public class FlashyuserController {
         } catch (Exception e) {
             return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-
     }
 
 
+    @PutMapping("/changepassword")
+    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") final String token, @RequestBody UserDTO user) {
+        try {
+            String username = jwtService.getUsernameFromToken(token.substring(7));
+            boolean success = flashyuserService.changePassword(user, username);
+            if (success) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        }  catch (InvalidLoginException e) {
+            return new ResponseEntity<>("Invalid username", HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 

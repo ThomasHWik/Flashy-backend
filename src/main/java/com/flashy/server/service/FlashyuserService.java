@@ -7,6 +7,7 @@ import com.flashy.server.exceptions.InvalidLoginException;
 import com.flashy.server.repository.FlashyuserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FlashyuserService {
@@ -52,6 +53,7 @@ public class FlashyuserService {
         }
     }
 
+    @Transactional
     public boolean deleteUser(String username, String tokenusername) {
         Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
 
@@ -65,4 +67,22 @@ public class FlashyuserService {
         }
 
     }
+
+    @Transactional
+    public boolean changePassword(UserDTO user, String tokenusername) throws InvalidLoginException {
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
+        if (requestingUser != null && (requestingUser.getIsadmin() == 1 || tokenusername.equals(user.getUsername()))) {
+            Flashyuser dbUser = flashyuserRepository.getFirstByUsername(user.getUsername());
+            if (dbUser != null) {
+                dbUser.setPassword(hashingService.hashPassword(user.getPassword()));
+                flashyuserRepository.save(dbUser);
+                return true;
+            } else {
+                throw new InvalidLoginException();
+            }
+        } else {
+            return false;
+        }
+    }
+
 }
