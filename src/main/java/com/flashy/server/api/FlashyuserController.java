@@ -55,9 +55,22 @@ public class FlashyuserController {
         }
     }
 
-    @DeleteMapping("/user/delete")
-    public ResponseEntity<String> deleteAdmin() {
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+    @DeleteMapping("/delete/{username}")
+    public ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token, @PathVariable String username) {
+        try {
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+
+            boolean success = flashyuserService.deleteUser(username, tokenusername);
+            if (success) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        }  catch (Exception e) {
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/admin/create")

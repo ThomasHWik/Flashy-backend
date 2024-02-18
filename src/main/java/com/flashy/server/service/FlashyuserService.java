@@ -51,4 +51,18 @@ public class FlashyuserService {
             return false;
         }
     }
+
+    public boolean deleteUser(String username, String tokenusername) {
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
+
+        if (requestingUser != null && (requestingUser.getIsadmin() == 1 || username.equals(tokenusername))) {
+            System.out.println("deleted");
+
+            // flashyuserRepository.deleteByUsername(username);
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 }
