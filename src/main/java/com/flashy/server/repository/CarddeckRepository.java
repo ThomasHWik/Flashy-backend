@@ -25,6 +25,7 @@ public interface CarddeckRepository extends JpaRepository<Carddeck, Long> {
         @Modifying
         void deleteById(int id);
 
-
-
+        @Modifying
+        @Query("DELETE FROM Carddeck x WHERE x.flashyuser_id = :id")
+        void deleteByFlashyuser_id(int id);
 }

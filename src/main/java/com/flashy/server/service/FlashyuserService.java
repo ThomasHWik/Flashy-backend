@@ -2,10 +2,14 @@ package com.flashy.server.service;
 
 import com.flashy.server.core.User;
 import com.flashy.server.core.UserDTO;
+import com.flashy.server.data.Carddeck;
 import com.flashy.server.data.Flashyuser;
 import com.flashy.server.exceptions.InvalidLoginException;
+import com.flashy.server.repository.CarddeckRepository;
+import com.flashy.server.repository.FlashcardRepository;
 import com.flashy.server.repository.FlashyuserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +20,12 @@ public class FlashyuserService {
 
     @Autowired
     FlashyuserRepository flashyuserRepository;
+
+    @Autowired
+    FlashcardRepository flashcardRepository;
+
+    @Autowired
+    CarddeckRepository carddeckRepository;
 
     HashingService hashingService = new HashingService();
 
@@ -58,11 +68,15 @@ public class FlashyuserService {
     @Transactional
     public boolean deleteUser(String username, String tokenusername) {
         Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
+        Flashyuser deletedUser = flashyuserRepository.getFirstByUsername(username);
+        if (requestingUser != null && deletedUser != null && (requestingUser.getIsadmin() == 1 || username.equals(tokenusername))) {
+            List<Carddeck> decks = carddeckRepository.getAllByFlashyuser_idEqualsAndAuthorized(deletedUser.getId());
+            for (Carddeck d : decks) {
+                flashcardRepository.deleteByCarddeckId(d.getId());
+            }
+            carddeckRepository.deleteByFlashyuser_id(deletedUser.getId());
 
-        if (requestingUser != null && (requestingUser.getIsadmin() == 1 || username.equals(tokenusername))) {
-            System.out.println("deleted");
-
-            // flashyuserRepository.deleteByUsername(username);
+            flashyuserRepository.deleteByUsername(username);
             return true;
         } else {
             return false;
