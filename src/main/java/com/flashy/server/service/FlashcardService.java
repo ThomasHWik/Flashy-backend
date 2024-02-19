@@ -12,6 +12,7 @@ import com.flashy.server.repository.FlashcardRepository;
 import com.flashy.server.repository.FlashyuserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,5 +72,44 @@ public class FlashcardService {
             return new CarddeckListDTO(username, new ArrayList<>(), isAuthorized ? 1 : 0);
         }
 
+    }
+
+    @Transactional
+    public boolean editCarddeck(FlashcardDeck flashcardDeck, String username) {
+
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(flashcardDeck.getUuid());
+        if (dbDeck == null) {
+            return false;
+        }
+        System.out.println(dbDeck.getIsprivate());
+        dbDeck.setTitle(flashcardDeck.getName());
+        if (dbUser != null && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getId())) {
+            dbDeck.setIsprivate(flashcardDeck.getIsprivate());
+        } else if (dbDeck.getIsprivate() == 1) {
+            // return false only if the deck is private and is being edited by a person not owner or admin
+                return false;
+        }
+
+
+
+        carddeckRepository.save(dbDeck);
+        flashcardRepository.deleteByCarddeckId(dbDeck.getId());
+
+        return createFlashcards(flashcardDeck, dbDeck.getId());
+    }
+
+
+    @Transactional
+    public boolean deleteCarddeck(String uuid, String username) {
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
+        if (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getIsadmin()) {
+            flashcardRepository.deleteByCarddeckId(dbDeck.getId());
+            carddeckRepository.deleteById(dbDeck.getId());
+            return true;
+        } else {
+            return false;
+        }
     }
 }
