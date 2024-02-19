@@ -26,25 +26,68 @@ public class FlashcardController {
     private JWTService jwtService;
 
 
-
     @PostMapping("/create")
     public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck, @RequestHeader("Authorization") final String token) {
-           try {
-               String username = jwtService.getUsernameFromToken(token.substring(7));
+        try {
+            String username = jwtService.getUsernameFromToken(token.substring(7));
 
-               boolean success = flashcardService.createCarddeck(flashcardDeck, username);
-               if (success) {
-                   return new ResponseEntity<>("Success", HttpStatus.OK);
-               } else {
-                   return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
-               }
-           } catch (JWTVerificationException e) {
-               return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
-           } catch (Exception e) {
-                return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
-           }
+            boolean success = flashcardService.createCarddeck(flashcardDeck, username);
+            if (success) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
+
+    @PutMapping("/edit")
+    public ResponseEntity<String> editCardDeck(@RequestBody FlashcardDeck flashcardDeck, @RequestHeader("Authorization") final String token) {
+        String username;
+        try {
+            username = jwtService.getUsernameFromToken(token.substring(7));
+        } catch (JWTVerificationException e) {
+            username = null;
+        }
+        try {
+            boolean success = flashcardService.editCarddeck(flashcardDeck, username);
+            if (success) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @DeleteMapping("/delete/{uuid}")
+    public ResponseEntity<String> editCardDeck(@PathVariable String uuid, @RequestHeader("Authorization") final String token) {
+
+        try {
+            String username = jwtService.getUsernameFromToken(token.substring(7));
+
+            boolean success = flashcardService.deleteCarddeck(uuid, username);
+            if (success) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
 
     @GetMapping("/id/{uuid}")
     public ResponseEntity<CarddeckDTO> getCarddeckByUuid(@PathVariable String uuid) {
@@ -82,7 +125,6 @@ public class FlashcardController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
 }
