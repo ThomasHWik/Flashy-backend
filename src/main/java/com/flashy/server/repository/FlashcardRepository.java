@@ -23,4 +23,5 @@ public interface FlashcardRepository extends JpaRepository<Flashcard, Long> {
     @Query("DELETE FROM Flashcard x WHERE x.carddeck_id = :id")
     void deleteByCarddeckId(int id);
 
+
 }
