@@ -3,6 +3,7 @@ package com.flashy.server.core;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 
@@ -18,12 +19,13 @@ public class FlashcardDeck {
     private String username;
 
     public FlashcardDeck() {
-
+        this.cards = new ArrayList<>();
     }
 
 
     public FlashcardDeck(String name) {
         this.name = name;
+        this.cards = new ArrayList<>();
     }
     public FlashcardDeck (String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username) {
         this.name = name;
@@ -31,6 +33,7 @@ public class FlashcardDeck {
         this.uuid = uuid;
         this.isprivate = isprivate;
         this.username = username;
+        this.cards = new ArrayList<>();
     }
 
 
@@ -49,15 +52,6 @@ public class FlashcardDeck {
         this.cards.add(new FlashcardDTO(question, answer, uuid));
     }
 
-    public void removeCard(String question) {
-        for (FlashcardDTO card : cards) {
-            if (card.getQuestion().equals(question)) {
-
-                this.cards.remove(card);
-                break;
-            }
-        }
-    }
 
     public void swapCards(int index1, int index2) {
         FlashcardDTO tempIndex1 = cards.get((index1));

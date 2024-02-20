@@ -32,27 +32,19 @@ public class FlashcardDeckTest {
         assertEquals(1, deck.getCards().size());
     }
 
-    // Test the deleteCard method
-    @Test
-    public void testRemoveCard() {
-        deck.addCard("Question", "Answer", String.valueOf(deck.getCards().size() + 1));
-        deck.removeCard(1+"");
-        assertEquals(0, deck.getCards().size());
-    }
-
     // Test the swapCards method
     @Test
     public void testSwapCards() {
         for (int i = 0; i < 10; i++) {
-            deck.addCard("Question" + i, "Answer" + i, UUID.randomUUID().toString());
+            deck.addCard("Question" + i, "Answer" + i, Integer.toString(i));
         }
         deck.swapCards(3, 7);
         assertEquals(deck.getCards().get(3).getQuestion(), "Question7");
         assertEquals(deck.getCards().get(7).getQuestion(), "Question3");
         assertEquals(deck.getCards().get(3).getAnswer(), "Answer7");
         assertEquals(deck.getCards().get(7).getAnswer(), "Answer3");
-        assertEquals(deck.getCards().get(3).getUuid(), 7);
-        assertEquals(deck.getCards().get(7).getUuid(), 3);
+        assertEquals(deck.getCards().get(3).getUuid(), "7");
+        assertEquals(deck.getCards().get(7).getUuid(), "3");
     }
 
     // Test the shuffleCards method
