@@ -14,23 +14,27 @@ public class FlashcardTest {
     int cardID;
     FlashcardDTO flashcard;
 
+    String uuid;
+
     // Set up the test
     @BeforeEach
     public void setUp() {
         question = "question";
         answer = "answer";
-        flashcard = new FlashcardDTO(question, answer, UUID.randomUUID().toString());
+        uuid = UUID.randomUUID().toString();
+
+        flashcard = new FlashcardDTO(question, answer, uuid);
     }
 
     // Test the constructor
     @Test
     public void testFlashcard() {
 
-        FlashcardDTO flashcard = new FlashcardDTO(question, answer, UUID.randomUUID().toString());
+        FlashcardDTO flashcard = new FlashcardDTO(question, answer, uuid);
 
         assertEquals(question, flashcard.getQuestion());
         assertEquals(answer, flashcard.getAnswer());
-        assertEquals(cardID, flashcard.getUuid());
+        assertEquals(uuid, flashcard.getUuid());
     }
 
     // Test the getQuestion method
@@ -48,7 +52,7 @@ public class FlashcardTest {
     // Test the getCardID method
     @Test
     public void testGetCardID() {
-        assertEquals(1, flashcard.getUuid());
+        assertEquals(uuid, flashcard.getUuid());
     }
 
     // Test the setQuestion method
@@ -74,8 +78,9 @@ public class FlashcardTest {
     // Test the setCardID method
     @Test
     public void testSetCardID() {
-        flashcard.setUuid("2");
-        assertEquals(2, flashcard.getUuid());
+        String uuid2 = "2";
+        flashcard.setUuid(uuid2);
+        assertEquals(uuid2, flashcard.getUuid());
     }
 
 }
