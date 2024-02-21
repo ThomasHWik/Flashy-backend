@@ -32,6 +32,17 @@ public class FlashcardService {
 
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
+            flashcardDeck.setCards(flashcardDeck.getCards().stream().filter(x -> !x.getQuestion().isEmpty() && !x.getAnswer().isEmpty()).toList());
+
+            for (FlashcardDTO f : flashcardDeck.getCards()) {
+                    if (f.getQuestion() == null) {
+                        f.setQuestion("");
+                    }
+                    if (f.getAnswer() == null) {
+                        f.setAnswer("");
+                    }
+            }
+
             flashcardRepository.saveAll(flashcardDeck.getCards().stream().map(x -> new Flashcard(x.getQuestion(), x.getAnswer(), UUID.randomUUID().toString(), carddeckId)).toList());
             return true;
         } catch (Exception e) {
@@ -45,7 +56,7 @@ public class FlashcardService {
             Flashyuser user = flashyuserRepository.getFirstByUsername(username);
             if (user == null) {
                 return null;
-            } else {
+            } else if (!flashcardDeck.getName().isEmpty()) {
                 Carddeck deck = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(), flashcardDeck.getIsprivate(), user.getId()));
 
                 boolean success = createFlashcards(flashcardDeck, deck.getId());
@@ -54,6 +65,8 @@ public class FlashcardService {
                     return null;
                 }
                 return deck.getUuid();
+            } else {
+                return null;
             }
     }
 
