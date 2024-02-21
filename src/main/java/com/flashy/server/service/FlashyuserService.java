@@ -42,7 +42,7 @@ public class FlashyuserService {
 
     public int registrerUser(UserDTO user) throws InvalidLoginException {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(user.getUsername());
-        if (dbUser == null) {
+        if (dbUser == null && !user.getUsername().isEmpty()) {
             Flashyuser savedUser = flashyuserRepository.save(new Flashyuser(user.getUsername(), hashingService.hashPassword(user.getPassword()), 0));
             return savedUser.getIsadmin();
         } else {

@@ -25,7 +25,6 @@ public class FlashcardController {
     @Autowired
     private JWTService jwtService;
 
-
     @PostMapping("/create")
     public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck, @RequestHeader("Authorization") final String token) {
         try {
@@ -68,7 +67,6 @@ public class FlashcardController {
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<String> editCardDeck(@PathVariable String uuid, @RequestHeader("Authorization") final String token) {
-
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
