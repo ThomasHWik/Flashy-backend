@@ -40,14 +40,20 @@ public class FlashcardService {
         }
     }
 
-    public boolean createCarddeck(FlashcardDeck flashcardDeck, String username) {
+    public String createCarddeck(FlashcardDeck flashcardDeck, String username) {
 
             Flashyuser user = flashyuserRepository.getFirstByUsername(username);
             if (user == null) {
-                return false;
+                return null;
             } else {
-                int id = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(), flashcardDeck.getIsprivate(), user.getId())).getId();
-                return createFlashcards(flashcardDeck, id);
+                Carddeck deck = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(), flashcardDeck.getIsprivate(), user.getId()));
+
+                boolean success = createFlashcards(flashcardDeck, deck.getId());
+                if (!success) {
+                    carddeckRepository.deleteById(deck.getId());
+                    return null;
+                }
+                return deck.getUuid();
             }
     }
 
@@ -69,7 +75,7 @@ public class FlashcardService {
             List<CarddeckDTO> dtoDecks = storedDecks.stream().map(x -> new CarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), username)).toList();
             return new CarddeckListDTO(username, dtoDecks, isAuthorized ? 1 : 0);
         } else {
-            return new CarddeckListDTO(username, new ArrayList<>(), isAuthorized ? 1 : 0);
+            return null;
         }
 
     }
@@ -77,9 +83,12 @@ public class FlashcardService {
     @Transactional
     public boolean editCarddeck(FlashcardDeck flashcardDeck, String username) {
 
+
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(flashcardDeck.getUuid());
         if (dbDeck == null) {
+
+
             return false;
         }
         System.out.println(dbDeck.getIsprivate());
@@ -104,7 +113,7 @@ public class FlashcardService {
     public boolean deleteCarddeck(String uuid, String username) {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
-        if (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getIsadmin()) {
+        if ((dbUser != null && dbDeck != null) && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getIsadmin())) {
             flashcardRepository.deleteByCarddeckId(dbDeck.getId());
             carddeckRepository.deleteById(dbDeck.getId());
             return true;
