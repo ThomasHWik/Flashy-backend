@@ -8,6 +8,8 @@ import com.flashy.server.exceptions.InvalidLoginException;
 import com.flashy.server.repository.CarddeckRepository;
 import com.flashy.server.repository.FlashcardRepository;
 import com.flashy.server.repository.FlashyuserRepository;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -109,4 +111,7 @@ public class FlashyuserService {
             return null;
         }
     }
+
+
+
 }

@@ -31,9 +31,9 @@ public class FlashcardController {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
-            boolean success = flashcardService.createCarddeck(flashcardDeck, username);
-            if (success) {
-                return new ResponseEntity<>("Success", HttpStatus.OK);
+            String uuid = flashcardService.createCarddeck(flashcardDeck, username);
+            if (uuid != null) {
+                return new ResponseEntity<>(uuid, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
             }
