@@ -64,7 +64,6 @@ public class FlashcardController {
             e.printStackTrace();
             return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @DeleteMapping("/delete/{uuid}")
@@ -80,6 +79,7 @@ public class FlashcardController {
                 return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
             }
         } catch (JWTVerificationException e) {
+
             return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             e.printStackTrace();
