@@ -32,7 +32,7 @@ public class FlashcardService {
 
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
-            flashcardDeck.setCards(flashcardDeck.getCards().stream().filter(x -> !x.getQuestion().isEmpty() && !x.getAnswer().isEmpty()).toList());
+            flashcardDeck.setCards(flashcardDeck.getCards().stream().filter(x -> (x.getQuestion() == null || !x.getQuestion().isEmpty()) && (x.getQuestion() == null || !x.getAnswer().isEmpty())).toList());
 
             for (FlashcardDTO f : flashcardDeck.getCards()) {
                     if (f.getQuestion() == null) {
