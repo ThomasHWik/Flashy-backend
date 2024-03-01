@@ -16,12 +16,12 @@ import java.util.List;
 public interface FlashcardRepository extends JpaRepository<Flashcard, Long> {
     Flashcard findById(int id);
 
-    @Query("SELECT x FROM Flashcard x WHERE x.carddeck_id = :id")
-    List<Flashcard> findAllByCarddeckId(int id);
+    @Query("SELECT x FROM Flashcard x WHERE x.carddeckid = :id")
+    List<Flashcard> findAllByCarddeckid(int id);
 
     @Modifying
-    @Query("DELETE FROM Flashcard x WHERE x.carddeck_id = :id")
-    void deleteByCarddeckId(int id);
+    @Query("DELETE FROM Flashcard x WHERE x.carddeckid = :id")
+    void deleteByCarddeckid(int id);
 
 
 }

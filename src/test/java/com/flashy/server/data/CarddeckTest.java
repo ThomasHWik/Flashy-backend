@@ -20,12 +20,12 @@ public class CarddeckTest {
 
         Carddeck carddeck = new Carddeck();
         carddeck.setUuid("uuid");
-        carddeck.setFlashyuser_id(1);
+        carddeck.setFlashyuserid(1);
         carddeck.setIsprivate(1);
         carddeck.setTitle("name");
 
         assertEquals("uuid", carddeck.getUuid());
-        assertEquals(1, carddeck.getFlashyuser_id());
+        assertEquals(1, carddeck.getFlashyuserid());
         assertEquals(1, carddeck.getIsprivate());
         assertEquals("name", carddeck.getTitle());
 
@@ -36,13 +36,13 @@ public class CarddeckTest {
     public void testEquals() {
         Carddeck carddeck = new Carddeck();
         carddeck.setUuid("uuid");
-        carddeck.setFlashyuser_id(1);
+        carddeck.setFlashyuserid(1);
         carddeck.setIsprivate(1);
         carddeck.setTitle("name");
 
         Carddeck carddeck2 = new Carddeck();
         carddeck2.setUuid("uuid");
-        carddeck2.setFlashyuser_id(1);
+        carddeck2.setFlashyuserid(1);
         carddeck2.setIsprivate(1);
         carddeck2.setTitle("name");
 
@@ -53,13 +53,13 @@ public class CarddeckTest {
     public void testHashcode() {
         Carddeck carddeck = new Carddeck();
         carddeck.setUuid("uuid");
-        carddeck.setFlashyuser_id(1);
+        carddeck.setFlashyuserid(1);
         carddeck.setIsprivate(1);
         carddeck.setTitle("name");
 
         Carddeck carddeck2 = new Carddeck();
         carddeck2.setUuid("uuid");
-        carddeck2.setFlashyuser_id(1);
+        carddeck2.setFlashyuserid(1);
         carddeck2.setIsprivate(1);
         carddeck2.setTitle("name");
 

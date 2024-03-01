@@ -22,26 +22,26 @@ public class Flashcard {
     private String answer;
 
     @NotBlank
-    private int carddeck_id;
+    private int carddeckid;
 
     @NotBlank
     private String uuid;
 
 
-    public Flashcard(int id, String question, String answer, int carddeck_id, String uuid) {
+    public Flashcard(int id, String question, String answer, int carddeckid, String uuid) {
         this.question = question;
         this.answer = answer;
         this.id = id;
         this.uuid = uuid;
-        this.carddeck_id = carddeck_id;
+        this.carddeckid = carddeckid;
 
     }
 
-    public Flashcard(String question, String answer, String uuid, int carddeck_id) {
+    public Flashcard(String question, String answer, String uuid, int carddeckid) {
         this.question = question;
         this.answer = answer;
         this.uuid = uuid;
-        this.carddeck_id = carddeck_id;
+        this.carddeckid = carddeckid;
     }
 
     public Flashcard() {

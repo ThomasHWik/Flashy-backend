@@ -17,12 +17,12 @@ public class FlashcardTest {
         flashcard.setAnswer("answer");
         flashcard.setQuestion("question");
         flashcard.setUuid("uuid");
-        flashcard.setCarddeck_id(1);
+        flashcard.setCarddeckid(1);
 
         assertEquals("answer", flashcard.getAnswer());
         assertEquals("question", flashcard.getQuestion());
         assertEquals("uuid", flashcard.getUuid());
-        assertEquals(1, flashcard.getCarddeck_id());
+        assertEquals(1, flashcard.getCarddeckid());
     }
 
     @Test
@@ -31,13 +31,13 @@ public class FlashcardTest {
         flashcard.setAnswer("answer");
         flashcard.setQuestion("question");
         flashcard.setUuid("uuid");
-        flashcard.setCarddeck_id(1);
+        flashcard.setCarddeckid(1);
 
         Flashcard flashcard2 = new Flashcard();
         flashcard2.setAnswer("answer");
         flashcard2.setQuestion("question");
         flashcard2.setUuid("uuid");
-        flashcard2.setCarddeck_id(1);
+        flashcard2.setCarddeckid(1);
 
         assertEquals(flashcard, flashcard2);
     }
@@ -48,13 +48,13 @@ public class FlashcardTest {
         flashcard.setAnswer("answer");
         flashcard.setQuestion("question");
         flashcard.setUuid("uuid");
-        flashcard.setCarddeck_id(1);
+        flashcard.setCarddeckid(1);
 
         Flashcard flashcard2 = new Flashcard();
         flashcard2.setAnswer("answer");
         flashcard2.setQuestion("question");
         flashcard2.setUuid("uuid");
-        flashcard2.setCarddeck_id(1);
+        flashcard2.setCarddeckid(1);
 
         assertEquals(flashcard.hashCode(), flashcard2.hashCode());
     }

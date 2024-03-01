@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/flashcard")
@@ -26,7 +28,8 @@ public class FlashcardController {
     private JWTService jwtService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck, @RequestHeader("Authorization") final String token) {
+    public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck,
+            @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -45,7 +48,8 @@ public class FlashcardController {
     }
 
     @PutMapping("/edit")
-    public ResponseEntity<String> editCardDeck(@RequestBody FlashcardDeck flashcardDeck, @RequestHeader("Authorization") final String token) {
+    public ResponseEntity<String> editCardDeck(@RequestBody FlashcardDeck flashcardDeck,
+            @RequestHeader("Authorization") final String token) {
         String username;
         try {
             username = jwtService.getUsernameFromToken(token.substring(7));
@@ -66,7 +70,8 @@ public class FlashcardController {
     }
 
     @DeleteMapping("/delete/{uuid}")
-    public ResponseEntity<String> editCardDeck(@PathVariable String uuid, @RequestHeader("Authorization") final String token) {
+    public ResponseEntity<String> editCardDeck(@PathVariable String uuid,
+            @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -86,7 +91,6 @@ public class FlashcardController {
 
     }
 
-
     @GetMapping("/id/{uuid}")
     public ResponseEntity<CarddeckDTO> getCarddeckByUuid(@PathVariable String uuid) {
         System.out.println(uuid);
@@ -103,7 +107,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<CarddeckListDTO> getCarddecksFromUser(@PathVariable String username, @RequestHeader("Authorization") final String token) {
+    public ResponseEntity<CarddeckListDTO> getCarddecksFromUser(@PathVariable String username,
+            @RequestHeader("Authorization") final String token) {
         boolean isAuthorized;
         try {
             isAuthorized = jwtService.checkUsernameCorrespondsWithToken(username, token.substring(7));
@@ -121,6 +126,82 @@ public class FlashcardController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/favorite/add/{uuid}")
+    public ResponseEntity<String> addFavorite(@PathVariable String uuid,
+            @RequestHeader("Authorization") final String token) {
+        try {
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+            boolean isSuccess = flashcardService.addUserFavorites(tokenusername, uuid);
+            if (isSuccess) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/favorite/remove/{uuid}")
+    public ResponseEntity<String> removeFavorite(@PathVariable String uuid,
+            @RequestHeader("Authorization") final String token) {
+        try {
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+            boolean isSuccess = flashcardService.removeUserFavorites(tokenusername, uuid);
+            if (isSuccess) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/like/add/{uuid}")
+    public ResponseEntity<String> addLike(@PathVariable String uuid,
+            @RequestHeader("Authorization") final String token) {
+        try {
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+            boolean isSuccess = flashcardService.addUserLikes(tokenusername, uuid);
+            if (isSuccess) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PostMapping("/like/remove/{uuid}")
+    public ResponseEntity<String> removeLike(@PathVariable String uuid,
+                                                 @RequestHeader("Authorization") final String token) {
+        try {
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+            boolean isSuccess = flashcardService.removeUserLikes(tokenusername, uuid);
+            if (isSuccess) {
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
+            }
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

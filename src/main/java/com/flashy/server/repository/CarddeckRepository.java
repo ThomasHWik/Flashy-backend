@@ -16,16 +16,16 @@ import java.util.List;
 public interface CarddeckRepository extends JpaRepository<Carddeck, Long> {
         Carddeck getFirstByUuid(String uuid);
 
-        @Query("SELECT x FROM Carddeck x WHERE x.flashyuser_id = :id AND x.isprivate = 0")
-        List<Carddeck> getAllByFlashyuser_idEqualsAndNotAuthorized(int id);
+        @Query("SELECT x FROM Carddeck x WHERE x.flashyuserid = :id AND x.isprivate = 0")
+        List<Carddeck> getAllByFlashyuseridEqualsAndNotAuthorized(int id);
 
-        @Query("SELECT x FROM Carddeck x WHERE x.flashyuser_id = :id")
-        List<Carddeck> getAllByFlashyuser_idEqualsAndAuthorized(int id);
+        @Query("SELECT x FROM Carddeck x WHERE x.flashyuserid = :id")
+        List<Carddeck> getAllByFlashyuseridEqualsAndAuthorized(int id);
 
         @Modifying
         void deleteById(int id);
 
         @Modifying
-        @Query("DELETE FROM Carddeck x WHERE x.flashyuser_id = :id")
-        void deleteByFlashyuser_id(int id);
+        @Query("DELETE FROM Carddeck x WHERE x.flashyuserid = :id")
+        void deleteByFlashyuserid(int id);
 }

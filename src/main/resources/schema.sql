@@ -18,8 +18,8 @@ CREATE TABLE carddeck
     uuid      VARCHAR(36) NOT NULL,
     title     VARCHAR(55) NOT NULL,
     isprivate BIT         NOT NULL,
-    flashyuser_id   INT         NOT NULL,
-    CONSTRAINT fk_flashyuser_id FOREIGN KEY (flashyuser_id) REFERENCES flashyuser (id)
+    flashyuserid   INT         NOT NULL,
+    CONSTRAINT fk_flashyuserid FOREIGN KEY (flashyuserid) REFERENCES flashyuser (id)
 )
 
 
@@ -29,42 +29,51 @@ CREATE TABLE flashcard
     uuid        VARCHAR(36)  NOT NULL,
     question    VARCHAR(255) NOT NULL,
     answer      VARCHAR(255) NOT NULL,
-    carddeck_id INT          NOT NULL,
-    CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id)
+    carddeckid INT          NOT NULL,
+    CONSTRAINT fk_carddeckid FOREIGN KEY (carddeckid) REFERENCES carddeck (id)
 
 )
 
-CREATE TABLE user_has_like
+CREATE TABLE userhaslike
+ (
+     id          INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+     flashyuserid     INT NOT NULL,
+     CONSTRAiNT fk_flashyuserid0 FOREIGN KEY (flashyuserid) REFERENCES flashyuser (id),
+     carddeckid INT NOT NULL,
+     CONSTRAINT fk_carddeckid0 FOREIGN KEY (carddeckid) REFERENCES carddeck (id),
+
+    CONSTRAINT userhaslikeunique UNIQUE(flashyuserid, carddeckid)
+ )
+
+CREATE TABLE carddeckHasCategory
 (
-    flashyuser_id     INT NOT NULL,
-    CONSTRAINT fk_flashyuser_id FOREIGN KEY (flashyuser_id) REFERENCES flashyuser (id),
-    carddeck_id INT NOT NULL,
-    CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id)
+    id          INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    categoryid INT NOT NULL,
+    CONSTRAINT fk_categoryid FOREIGN KEY (categoryid) REFERENCES category (id),
+    carddeckid INT NOT NULL,
+    CONSTRAINT fk_carddeckid FOREiGN KEY (carddeckid) REFERENCES carddeck (id),
+
 )
 
-CREATE TABLE carddeck_has_category
-(
-    category_id INT NOT NULL,
-    CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES category (id),
-    carddeck_id INT NOT NULL,
-    CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id),
-)
 
-
-CREATE TABLE user_has_favourite
+CREATE TABLE userhasfavorite
 (
-    flashyuser_id     INT NOT NULL,
-    CONSTRAINT fk_flashyuser_id FOREIGN KEY (flashyuser_id) REFERENCES flashyuser (id),
-    carddeck_id INT NOT NULL,
-    CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id),
+    id             INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+
+    flashyuserid     iNT NOT NULL,
+    CONSTRAINT fk_flashyuserid FOREIGN KEY (flashyuserid) REFERENCES flashyuser (id),
+    carddeckid INT NOT NULL,
+    CONSTRAINT fk_carddeckid FOREIGN KEY (carddeckid) REFERENCES carddeck (id),
+
+    CONSTRAINT userhasfavoriteunique UNIQUE(flashyuserid, carddeckid)
 )
 
 CREATE TABLE comment
 (
     id          INT NOT NULL PRIMARY KEY IDENTITY(1,1),
     comment     VARCHAR(300),
-    carddeck_id INT NOT NULL,
-    CONSTRAINT fk_carddeck_id FOREIGN KEY (carddeck_id) REFERENCES carddeck (id),
-    user_id     INT,
-    CONSTRAINT fk_flashyuser_id FOREIGN KEY (user_id) REFERENCES flashyuser (id),
+    carddeckid INT NOT NULL,
+    CONSTRAINT fk_carddeckId FOREIGN KEY (carddeckid) REFERENCES carddeck (id),
+    userid     INT,
+    CONSTRAINT fk_flashyuserid FOREIGN KEY (userid) REFERENCES flashyuser (id),
 )
