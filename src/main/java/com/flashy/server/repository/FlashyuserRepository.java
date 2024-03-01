@@ -24,6 +24,5 @@ public interface FlashyuserRepository extends JpaRepository<Flashyuser, Long> {
         void deleteByUsername(String username);
 
         @Query("SELECT x FROM Flashyuser x WHERE x.isadmin = 1")
-
         List<Flashyuser> findWhereIsAdmin();
 }

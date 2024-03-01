@@ -72,11 +72,11 @@ public class FlashyuserService {
         Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
         Flashyuser deletedUser = flashyuserRepository.getFirstByUsername(username);
         if (requestingUser != null && deletedUser != null && (requestingUser.getIsadmin() == 1 || username.equals(tokenusername))) {
-            List<Carddeck> decks = carddeckRepository.getAllByFlashyuser_idEqualsAndAuthorized(deletedUser.getId());
+            List<Carddeck> decks = carddeckRepository.getAllByFlashyuseridEqualsAndAuthorized(deletedUser.getId());
             for (Carddeck d : decks) {
-                flashcardRepository.deleteByCarddeckId(d.getId());
+                flashcardRepository.deleteByCarddeckid(d.getId());
             }
-            carddeckRepository.deleteByFlashyuser_id(deletedUser.getId());
+            carddeckRepository.deleteByFlashyuserid(deletedUser.getId());
 
             flashyuserRepository.deleteByUsername(username);
             return true;

@@ -9,39 +9,31 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Carddeck {
+public class Userhasfavorite {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotBlank
-    private String uuid;
-
-    @NotBlank
-    private String title;
-
-    @NotBlank
-    private int isprivate;
-
-    @NotBlank
     private int flashyuserid;
 
+    @NotBlank
+    private int carddeckid;
 
-    public Carddeck() {
+    public Userhasfavorite() {
 
     }
-    public Carddeck(int id, String uuid, String title, int isprivate, int flashyuserid) {
+
+    public Userhasfavorite(int id, int flashyuserid, int carddeckid) {
         this.id = id;
-        this.uuid = uuid;
-        this.title = title;
-        this.isprivate = isprivate;
         this.flashyuserid = flashyuserid;
+        this.carddeckid = carddeckid;
     }
 
-    public Carddeck(String uuid, String title, int isprivate, int flashyuserid) {
-        this.uuid = uuid;
-        this.title = title;
-        this.isprivate = isprivate;
+    public Userhasfavorite(int flashyuserid, int carddeckid) {
         this.flashyuserid = flashyuserid;
+        this.carddeckid = carddeckid;
     }
+
 }

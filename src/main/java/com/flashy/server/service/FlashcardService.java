@@ -4,46 +4,57 @@ import com.flashy.server.core.CarddeckDTO;
 import com.flashy.server.core.CarddeckListDTO;
 import com.flashy.server.core.FlashcardDTO;
 import com.flashy.server.core.FlashcardDeck;
-import com.flashy.server.data.Carddeck;
-import com.flashy.server.data.Flashcard;
-import com.flashy.server.data.Flashyuser;
+import com.flashy.server.data.*;
 import com.flashy.server.repository.CarddeckRepository;
 import com.flashy.server.repository.FlashcardRepository;
 import com.flashy.server.repository.FlashyuserRepository;
+import com.flashy.server.repository.UserhasfavoriteRepository;
+import com.flashy.server.repository.UserhaslikeRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class FlashcardService {
 
-   @Autowired
-   private FlashcardRepository flashcardRepository;
+    @Autowired
+    private FlashcardRepository flashcardRepository;
 
-   @Autowired
-   private CarddeckRepository carddeckRepository;
+    @Autowired
+    private CarddeckRepository carddeckRepository;
 
-   @Autowired
-   private FlashyuserRepository flashyuserRepository;
+    @Autowired
+    private FlashyuserRepository flashyuserRepository;
+
+    @Autowired
+    private UserhasfavoriteRepository userhasfavoriteRepository;
+
+    @Autowired
+    private UserhaslikeRepository userhaslikeRepository;
 
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
-            flashcardDeck.setCards(flashcardDeck.getCards().stream().filter(x -> (x.getQuestion() == null || !x.getQuestion().isEmpty()) && (x.getQuestion() == null || !x.getAnswer().isEmpty())).toList());
+            flashcardDeck.setCards(flashcardDeck.getCards().stream()
+                    .filter(x -> (x.getQuestion() == null || !x.getQuestion().isEmpty())
+                            && (x.getQuestion() == null || !x.getAnswer().isEmpty()))
+                    .toList());
 
             for (FlashcardDTO f : flashcardDeck.getCards()) {
-                    if (f.getQuestion() == null) {
-                        f.setQuestion("");
-                    }
-                    if (f.getAnswer() == null) {
-                        f.setAnswer("");
-                    }
+                if (f.getQuestion() == null) {
+                    f.setQuestion("");
+                }
+                if (f.getAnswer() == null) {
+                    f.setAnswer("");
+                }
             }
 
-            flashcardRepository.saveAll(flashcardDeck.getCards().stream().map(x -> new Flashcard(x.getQuestion(), x.getAnswer(), UUID.randomUUID().toString(), carddeckId)).toList());
+            flashcardRepository.saveAll(flashcardDeck.getCards().stream()
+                    .map(x -> new Flashcard(x.getQuestion(), x.getAnswer(), UUID.randomUUID().toString(), carddeckId))
+                    .toList());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,39 +64,45 @@ public class FlashcardService {
 
     public String createCarddeck(FlashcardDeck flashcardDeck, String username) {
 
-            Flashyuser user = flashyuserRepository.getFirstByUsername(username);
-            if (user == null) {
-                return null;
-            } else if (!flashcardDeck.getName().isEmpty()) {
-                Carddeck deck = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(), flashcardDeck.getIsprivate(), user.getId()));
+        Flashyuser user = flashyuserRepository.getFirstByUsername(username);
+        if (user == null) {
+            return null;
+        } else if (!flashcardDeck.getName().isEmpty()) {
+            Carddeck deck = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(),
+                    flashcardDeck.getIsprivate(), user.getId()));
 
-                boolean success = createFlashcards(flashcardDeck, deck.getId());
-                if (!success) {
-                    carddeckRepository.deleteById(deck.getId());
-                    return null;
-                }
-                return deck.getUuid();
-            } else {
+            boolean success = createFlashcards(flashcardDeck, deck.getId());
+            if (!success) {
+                carddeckRepository.deleteById(deck.getId());
                 return null;
             }
+            return deck.getUuid();
+        } else {
+            return null;
+        }
     }
 
     public CarddeckDTO getCarddeck(String uuid) {
-            Carddeck deck = carddeckRepository.getFirstByUuid(uuid);
-            if (deck != null) {
-                List<Flashcard> cards = flashcardRepository.findAllByCarddeckId(deck.getId());
-                List<FlashcardDTO> dtocards = cards.stream().map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid())).toList();
-                Flashyuser user = flashyuserRepository.getById(deck.getFlashyuser_id());
-                return new CarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(), user != null ? user.getUsername() : "");
-            }
-            return null;
+        Carddeck deck = carddeckRepository.getFirstByUuid(uuid);
+        if (deck != null) {
+            List<Flashcard> cards = flashcardRepository.findAllByCarddeckid(deck.getId());
+            List<FlashcardDTO> dtocards = cards.stream()
+                    .map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid())).toList();
+            Flashyuser user = flashyuserRepository.getById(deck.getFlashyuserid());
+            return new CarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(),
+                    user != null ? user.getUsername() : "");
+        }
+        return null;
     }
 
     public CarddeckListDTO getUserDecks(String username, Boolean isAuthorized) {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         if (dbUser != null) {
-            List<Carddeck> storedDecks = isAuthorized ? carddeckRepository.getAllByFlashyuser_idEqualsAndAuthorized(dbUser.getId()) : carddeckRepository.getAllByFlashyuser_idEqualsAndNotAuthorized(dbUser.getId());
-            List<CarddeckDTO> dtoDecks = storedDecks.stream().map(x -> new CarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), username)).toList();
+            List<Carddeck> storedDecks = isAuthorized
+                    ? carddeckRepository.getAllByFlashyuseridEqualsAndAuthorized(dbUser.getId())
+                    : carddeckRepository.getAllByFlashyuseridEqualsAndNotAuthorized(dbUser.getId());
+            List<CarddeckDTO> dtoDecks = storedDecks.stream()
+                    .map(x -> new CarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), username)).toList();
             return new CarddeckListDTO(username, dtoDecks, isAuthorized ? 1 : 0);
         } else {
             return null;
@@ -96,43 +113,85 @@ public class FlashcardService {
     @Transactional
     public boolean editCarddeck(FlashcardDeck flashcardDeck, String username) {
 
-
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(flashcardDeck.getUuid());
         if (dbDeck == null) {
-
 
             return false;
         }
         System.out.println(dbDeck.getIsprivate());
         dbDeck.setTitle(flashcardDeck.getName());
-        if (dbUser != null && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getId())) {
+        if (dbUser != null && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuserid() == dbUser.getId())) {
             dbDeck.setIsprivate(flashcardDeck.getIsprivate());
         } else if (dbDeck.getIsprivate() == 1) {
-            // return false only if the deck is private and is being edited by a person not owner or admin
-                return false;
+            // return false only if the deck is private and is being edited by a person not
+            // owner or admin
+            return false;
         }
 
-
-
         carddeckRepository.save(dbDeck);
-        flashcardRepository.deleteByCarddeckId(dbDeck.getId());
+        flashcardRepository.deleteByCarddeckid(dbDeck.getId());
 
         return createFlashcards(flashcardDeck, dbDeck.getId());
     }
-
 
     @Transactional
     public boolean deleteCarddeck(String uuid, String username) {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
 
-        if ((dbUser != null && dbDeck != null) && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuser_id() == dbUser.getId())) {
-            flashcardRepository.deleteByCarddeckId(dbDeck.getId());
+        if ((dbUser != null && dbDeck != null)
+                && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+            flashcardRepository.deleteByCarddeckid(dbDeck.getId());
             carddeckRepository.deleteById(dbDeck.getId());
             return true;
         } else {
             return false;
         }
     }
+
+    public boolean addUserFavorites(String username, String uuid) {
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        if (dbUser != null && dbDeck != null && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+            Userhasfavorite userFavorite = new Userhasfavorite(dbUser.getId(), dbDeck.getId());
+            userhasfavoriteRepository.save(userFavorite);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean removeUserFavorites(String username, String uuid) {
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        if (dbUser != null && dbDeck != null) {
+            userhasfavoriteRepository.deleteByUserAndCarddeckid(dbUser.getId(), dbDeck.getId());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addUserLikes(String username, String uuid) {
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        if (dbUser != null && dbDeck != null && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+            Userhaslike userLike = new Userhaslike(dbUser.getId(), dbDeck.getId());
+            userhaslikeRepository.save(userLike);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean removeUserLikes(String username, String uuid) {
+        Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        if (dbUser != null && dbDeck != null) {
+            userhaslikeRepository.deleteByUserAndCarddeckid(dbUser.getId(), dbDeck.getId());
+            return true;
+        }
+        return false;
+    }
+
 }
