@@ -247,4 +247,21 @@ public class FlashcardService {
 
 
     }
+
+
+    public ExtendedCarddeckListDTO getFavoriteUserDecks(String username) {
+        Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+        if (dbUser != null) {
+            List<Extendedcarddeckview> favoritesDecks = extendedcarddeckviewRepository.getAllFavoritesByFlashyuserId(dbUser.getId());
+            List<ExtendedCarddeckDTO> dtoDecks = favoritesDecks.stream()
+                    .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
+                            x.getCardcount(), x.getLikecount(), x.getFavoritecount()))
+                    .toList();
+            return new ExtendedCarddeckListDTO(username, dtoDecks, 0, dtoDecks.size(), 0);
+        } else {
+            return null;
+        }
+    }
+
+
 }
