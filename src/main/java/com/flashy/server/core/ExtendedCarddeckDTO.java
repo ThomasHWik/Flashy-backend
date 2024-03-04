@@ -22,6 +22,8 @@ public class ExtendedCarddeckDTO {
 
     private List<CommentDTO> comments;
     private List<FlashcardDTO> flashcards;
+    private int isfavorited;
+    private int isliked;
 
 
     public ExtendedCarddeckDTO() {

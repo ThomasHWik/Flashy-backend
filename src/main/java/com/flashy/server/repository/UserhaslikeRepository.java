@@ -14,5 +14,7 @@ public interface UserhaslikeRepository extends JpaRepository<Userhaslike, Intege
     @Modifying
     @Query("DELETE FROM Userhaslike x WHERE x.carddeckid = :carddeckid AND x.flashyuserid = :userid")
     void deleteByUserAndCarddeckid(int userid, int carddeckid);
+
+    Userhaslike getFirstByFlashyuseridAndCarddeckid(int id, int id1);
 }
 
