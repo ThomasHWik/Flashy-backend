@@ -76,7 +76,7 @@ public class FlashcardControllerTest extends AbstractTest {
         }
 
         // get specific deck
-        CarddeckDTO storedDeck = flashcardService.getCarddeck(uuid);
+        ExtendedCarddeckDTO storedDeck = flashcardService.getCarddeck("admin", uuid);
         assertNotNull(storedDeck);
         assertEquals(flashcardDeck.getName(), storedDeck.getName());
         assertEquals(flashcardDeck.getCards().size(), storedDeck.getCards().size());
@@ -115,7 +115,7 @@ public class FlashcardControllerTest extends AbstractTest {
         }
 
         // get specific deck
-        storedDeck = flashcardService.getCarddeck(uuid1);
+        storedDeck = flashcardService.getCarddeck("admin", uuid1);
         assertNotNull(storedDeck);
         assertEquals(flashcardDeck.getName(), storedDeck.getName());
         assertEquals(flashcardDeck.getCards().size(), storedDeck.getCards().size());
@@ -195,7 +195,7 @@ public class FlashcardControllerTest extends AbstractTest {
         assertEquals(200, status);
 
         // check deck
-        CarddeckDTO d = flashcardService.getCarddeck(uuid);
+        ExtendedCarddeckDTO d = flashcardService.getCarddeck("admin", uuid);
         assertEquals(flashcardDeck.getName(), d.getName());
         assertEquals(flashcardDeck.getCards().size(), d.getCards().size());
         assertEquals(flashcardDeck.getIsprivate(), d.getIsprivate());
@@ -249,10 +249,10 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // get deck
         String uri = "/flashcard/id/" + flashcardDeck.getUuid();
-        mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)).andReturn();
+        mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        CarddeckDTO content1 = super.mapFromJson(mvcResult.getResponse().getContentAsString(), CarddeckDTO.class);
+        ExtendedCarddeckDTO content1 = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckDTO.class);
 
         assertEquals(flashcardDeck.getName(), content1.getName());
         assertEquals(flashcardDeck.getCards().size(), content1.getCards().size());

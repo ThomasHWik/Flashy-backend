@@ -33,5 +33,6 @@ public class CarddeckDTO {
         this.uuid = uuid;
         this.isprivate = isprivate;
         this.username = username;
+
     }
 }
