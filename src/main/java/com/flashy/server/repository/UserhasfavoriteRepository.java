@@ -14,4 +14,6 @@ public interface UserhasfavoriteRepository extends JpaRepository<Userhasfavorite
     @Modifying
     @Query("DELETE FROM Userhasfavorite x WHERE x.carddeckid = :carddeckid AND x.flashyuserid = :userid")
     void deleteByUserAndCarddeckid(int userid, int carddeckid);
+
+    Userhasfavorite getFirstByFlashyuseridAndCarddeckid(int userid, int carddeckid);
 }

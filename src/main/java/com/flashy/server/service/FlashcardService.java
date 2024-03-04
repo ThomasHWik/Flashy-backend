@@ -101,9 +101,15 @@ public class FlashcardService {
 
             List<Extendedcommentview> comments = extendedcommentviewRepository.findAllByCarddeckuuid(deck.getUuid());
 
+            Userhasfavorite isFavorite = userhasfavoriteRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(), deck.getId());
+            Userhaslike isLike = userhaslikeRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(), deck.getId());
+
             ExtendedCarddeckDTO res = new ExtendedCarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(),
                     user != null ? user.getUsername() : "", deck.getCardcount(), deck.getLikecount(), deck.getFavoritecount());
             res.setComments(comments.stream().map(x -> new CommentDTO(x.getComment(), x.getUsername(), x.getCarddeckuuid(), x.getUuid(), x.getCreatedat().toString())).toList());
+            res.setIsliked(isLike != null ? 1 : 0);
+            res.setIsfavorited(isFavorite != null ? 1 : 0);
+
             return res;
         }
         return null;
