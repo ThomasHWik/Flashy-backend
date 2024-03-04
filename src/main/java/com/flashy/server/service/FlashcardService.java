@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
@@ -208,8 +207,31 @@ public class FlashcardService {
         return false;
     }
 
-    public ExtendedCarddeckListDTO getAll(int from, int count) {
-        List<Extendedcarddeckview> decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count)).toList();
+    public ExtendedCarddeckListDTO getAll(int from, int count, String orderby) {
+        List<Extendedcarddeckview> decks;
+        switch (orderby) {
+            case "likeasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountAsc(PageRequest.of(from, count)).toList();
+                break;
+            case "likedesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountDesc(PageRequest.of(from, count)).toList();
+                break;
+            case "favoriteasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountAsc(PageRequest.of(from, count)).toList();
+                break;
+            case "favoritedesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountDesc(PageRequest.of(from, count)).toList();
+                break;
+            case "cardcountasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountAsc(PageRequest.of(from, count)).toList();
+                break;
+            case "cardcountdesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountDesc(PageRequest.of(from, count)).toList();
+                break;
+            default:
+                decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count)).toList();
+        }
+
         List<ExtendedCarddeckDTO> dtoDecks = decks.stream()
                 .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
                         x.getCardcount(), x.getLikecount(), x.getFavoritecount()))

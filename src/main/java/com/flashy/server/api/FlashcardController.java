@@ -206,10 +206,10 @@ public class FlashcardController {
         }
     }
 
-    @GetMapping("/all/{from}/{count}")
-    public ResponseEntity<ExtendedCarddeckListDTO> getLikes(@PathVariable String from, @PathVariable String count) {
+    @GetMapping("/all/{from}/{count}/{orderby}")
+    public ResponseEntity<ExtendedCarddeckListDTO> getLikes(@PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
         try {
-            ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count));
+            ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count), orderby);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
