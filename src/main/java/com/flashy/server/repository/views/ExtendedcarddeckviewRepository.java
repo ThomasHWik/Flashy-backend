@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 @Component
@@ -38,8 +40,7 @@ public interface ExtendedcarddeckviewRepository extends JpaRepository<Extendedca
     @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 ORDER BY x.cardcount ASC")
     Page<Extendedcarddeckview> findAllPublicOrderbyCardcountAsc(Pageable pageable);
 
-
-
-
-
+    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.id IN (SELECT y.carddeckid FROM Userhasfavorite y WHERE y.flashyuserid = :id)")
+    List<Extendedcarddeckview> getAllFavoritesByFlashyuserId(long id);
 }
+

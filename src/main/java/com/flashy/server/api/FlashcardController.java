@@ -27,7 +27,7 @@ public class FlashcardController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck,
-            @RequestHeader("Authorization") final String token) {
+                                                 @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -47,7 +47,7 @@ public class FlashcardController {
 
     @PutMapping("/edit")
     public ResponseEntity<String> editCardDeck(@RequestBody FlashcardDeck flashcardDeck,
-            @RequestHeader("Authorization") final String token) {
+                                               @RequestHeader("Authorization") final String token) {
         String username;
         try {
             username = jwtService.getUsernameFromToken(token.substring(7));
@@ -69,7 +69,7 @@ public class FlashcardController {
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<String> editCardDeck(@PathVariable String uuid,
-            @RequestHeader("Authorization") final String token) {
+                                               @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -99,8 +99,7 @@ public class FlashcardController {
             } else {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
-        }
-        catch (JWTVerificationException e) {
+        } catch (JWTVerificationException e) {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -109,7 +108,7 @@ public class FlashcardController {
 
     @GetMapping("/user/{username}")
     public ResponseEntity<CarddeckListDTO> getCarddecksFromUser(@PathVariable String username,
-            @RequestHeader("Authorization") final String token) {
+                                                                @RequestHeader("Authorization") final String token) {
         boolean isAuthorized;
         try {
             isAuthorized = jwtService.checkUsernameCorrespondsWithToken(username, token.substring(7));
@@ -132,7 +131,7 @@ public class FlashcardController {
 
     @PostMapping("/favorite/add/{uuid}")
     public ResponseEntity<String> addFavorite(@PathVariable String uuid,
-            @RequestHeader("Authorization") final String token) {
+                                              @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.addUserFavorites(tokenusername, uuid);
@@ -151,7 +150,7 @@ public class FlashcardController {
 
     @PostMapping("/favorite/remove/{uuid}")
     public ResponseEntity<String> removeFavorite(@PathVariable String uuid,
-            @RequestHeader("Authorization") final String token) {
+                                                 @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.removeUserFavorites(tokenusername, uuid);
@@ -170,7 +169,7 @@ public class FlashcardController {
 
     @PostMapping("/like/add/{uuid}")
     public ResponseEntity<String> addLike(@PathVariable String uuid,
-            @RequestHeader("Authorization") final String token) {
+                                          @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.addUserLikes(tokenusername, uuid);
@@ -189,7 +188,7 @@ public class FlashcardController {
 
     @PostMapping("/like/remove/{uuid}")
     public ResponseEntity<String> removeLike(@PathVariable String uuid,
-                                                 @RequestHeader("Authorization") final String token) {
+                                             @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.removeUserLikes(tokenusername, uuid);
@@ -213,12 +212,35 @@ public class FlashcardController {
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @GetMapping("/userfavorites/{username}")
+    public ResponseEntity<ExtendedCarddeckListDTO> getFavoriteCarddecksFromUser(@PathVariable String username,
+                                                                                @RequestHeader("Authorization") final String token) {
+        try {
+            boolean authorized = jwtService.checkUsernameCorrespondsWithToken(username, token.substring(7));
 
+
+            if (authorized) {
+                ExtendedCarddeckListDTO res = flashcardService.getFavoriteUserDecks(username);
+                if (res != null) {
+                    return new ResponseEntity<>(res, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            }
+
+        } catch (JWTVerificationException e) {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
