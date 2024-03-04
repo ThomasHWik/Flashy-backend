@@ -1,17 +1,15 @@
 package com.flashy.server.api;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.flashy.server.core.CarddeckDTO;
-import com.flashy.server.core.CarddeckListDTO;
-import com.flashy.server.core.FlashcardDeck;
-import com.flashy.server.data.Flashcard;
+import com.flashy.server.core.*;
+import com.flashy.server.data.dataviews.Extendedcarddeckview;
 import com.flashy.server.service.FlashcardService;
 import com.flashy.server.service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.flashy.server.core.ExtendedCarddeckDTO;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,15 +90,18 @@ public class FlashcardController {
     }
 
     @GetMapping("/id/{uuid}")
-    public ResponseEntity<CarddeckDTO> getCarddeckByUuid(@PathVariable String uuid) {
-        System.out.println(uuid);
+    public ResponseEntity<ExtendedCarddeckDTO> getCarddeckByUuid(@PathVariable String uuid, @RequestHeader("Authorization") final String token) {
         try {
-            CarddeckDTO res = flashcardService.getCarddeck(uuid);
+            String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
+            ExtendedCarddeckDTO res = flashcardService.getCarddeck(tokenusername, uuid);
             if (res != null) {
                 return new ResponseEntity<>(res, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
+        }
+        catch (JWTVerificationException e) {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -202,6 +203,20 @@ public class FlashcardController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/all/{from}/{count}")
+    public ResponseEntity<ExtendedCarddeckListDTO> getLikes(@PathVariable String from, @PathVariable String count) {
+        try {
+            ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count));
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

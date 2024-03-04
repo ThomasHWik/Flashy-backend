@@ -15,7 +15,7 @@ CREATE TABLE category
 CREATE TABLE carddeck
 (
     id        INT         NOT NULL PRIMARY KEY IDENTITY(1,1),
-    uuid      VARCHAR(36) NOT NULL,
+    uuid      VARCHAR(36) NOT NULL UNIQUE,
     title     VARCHAR(55) NOT NULL,
     isprivate BIT         NOT NULL,
     flashyuserid   INT         NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE carddeck
 CREATE TABLE flashcard
 (
     id          INT          NOT NULL PRIMARY KEY IDENTITY(1,1),
-    uuid        VARCHAR(36)  NOT NULL,
+    uuid        VARCHAR(36)  NOT NULL UNIQUE,
     question    VARCHAR(255) NOT NULL,
     answer      VARCHAR(255) NOT NULL,
     carddeckid INT          NOT NULL,
@@ -73,7 +73,25 @@ CREATE TABLE comment
     id          INT NOT NULL PRIMARY KEY IDENTITY(1,1),
     comment     VARCHAR(300),
     carddeckid INT NOT NULL,
-    CONSTRAINT fk_carddeckId FOREIGN KEY (carddeckid) REFERENCES carddeck (id),
-    userid     INT,
-    CONSTRAINT fk_flashyuserid FOREIGN KEY (userid) REFERENCES flashyuser (id),
+    CONSTRAINT fk_carddeckid1 FOREIGN KEY (carddeckid) REFERENCES carddeck (id),
+
+    flashyuserid     INT,
+    CONSTRAINT fk_flashyuserid1 FOREIGN KEY (flashyuserid) REFERENCES flashyuser (id),
+
+    createdat datetime DEFAULT(getdate()),
+    uuid       VARCHAR(36) NOT NULL UNIQUE,
 )
+
+CREATE VIEW extendedcarddeckview AS
+SELECT *,
+       (SELECT username FROM flashyuser WHERE flashyuser.id = carddeck.flashyuserid) as username,
+       (SELECT COUNT(*) FROM flashcard  WHERE carddeckid = carddeck.id) AS cardcount,
+       (SELECT COUNT(*) FROM userhaslike  WHERE carddeckid = carddeck.id) AS likecount,
+       (SELECT COUNT(*) FROM userhasfavorite  WHERE carddeckid = carddeck.id) AS favoritecount
+FROM carddeck;
+
+CREATE VIEW extendedcommentview AS
+SELECT *,
+       (SELECT username FROM flashyuser WHERE flashyuser.id = comment.flashyuserid) as username,
+         (SELECT uuid FROM carddeck WHERE carddeck.id = comment.carddeckid) as carddeckuuid
+    FROM comment;

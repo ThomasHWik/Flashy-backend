@@ -1,19 +1,18 @@
 package com.flashy.server.service;
 
-import com.flashy.server.core.CarddeckDTO;
-import com.flashy.server.core.CarddeckListDTO;
-import com.flashy.server.core.FlashcardDTO;
-import com.flashy.server.core.FlashcardDeck;
+import com.flashy.server.core.*;
+import com.flashy.server.data.dataviews.Extendedcarddeckview;
 import com.flashy.server.data.*;
-import com.flashy.server.repository.CarddeckRepository;
-import com.flashy.server.repository.FlashcardRepository;
-import com.flashy.server.repository.FlashyuserRepository;
-import com.flashy.server.repository.UserhasfavoriteRepository;
-import com.flashy.server.repository.UserhaslikeRepository;
+import com.flashy.server.data.dataviews.Extendedcommentview;
+import com.flashy.server.repository.*;
 
+import com.flashy.server.repository.views.ExtendedcarddeckviewRepository;
+import com.flashy.server.repository.views.ExtendedcommentviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +34,15 @@ public class FlashcardService {
 
     @Autowired
     private UserhaslikeRepository userhaslikeRepository;
+
+    @Autowired
+    private ExtendedcarddeckviewRepository extendedcarddeckviewRepository;
+
+    @Autowired
+    private ExtendedcommentviewRepository extendedcommentviewRepository;
+
+    @Autowired
+    private AccessService accessService;
 
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
@@ -82,15 +90,21 @@ public class FlashcardService {
         }
     }
 
-    public CarddeckDTO getCarddeck(String uuid) {
-        Carddeck deck = carddeckRepository.getFirstByUuid(uuid);
-        if (deck != null) {
+    public ExtendedCarddeckDTO getCarddeck(String username, String uuid) {
+        Extendedcarddeckview deck = extendedcarddeckviewRepository.getFirstByUuid(uuid);
+        Flashyuser dbuser = flashyuserRepository.getFirstByUsername(username);
+        if (deck != null && dbuser != null && accessService.hasCarddeckViewAccess(dbuser, deck)) {
             List<Flashcard> cards = flashcardRepository.findAllByCarddeckid(deck.getId());
             List<FlashcardDTO> dtocards = cards.stream()
                     .map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid())).toList();
             Flashyuser user = flashyuserRepository.getById(deck.getFlashyuserid());
-            return new CarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(),
-                    user != null ? user.getUsername() : "");
+
+            List<Extendedcommentview> comments = extendedcommentviewRepository.findAllByCarddeckuuid(deck.getUuid());
+
+            ExtendedCarddeckDTO res = new ExtendedCarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(),
+                    user != null ? user.getUsername() : "", deck.getCardcount(), deck.getLikecount(), deck.getFavoritecount());
+            res.setComments(comments.stream().map(x -> new CommentDTO(x.getComment(), x.getUsername(), x.getCarddeckuuid(), x.getUuid(), x.getCreatedat().toString())).toList());
+            return res;
         }
         return null;
     }
@@ -194,4 +208,15 @@ public class FlashcardService {
         return false;
     }
 
+    public ExtendedCarddeckListDTO getAll(int from, int count) {
+        List<Extendedcarddeckview> decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count)).toList();
+        List<ExtendedCarddeckDTO> dtoDecks = decks.stream()
+                .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
+                        x.getCardcount(), x.getLikecount(), x.getFavoritecount()))
+                .toList();
+
+        return new ExtendedCarddeckListDTO("", dtoDecks, 0, dtoDecks.size(), from);
+
+
+    }
 }
