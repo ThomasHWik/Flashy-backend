@@ -27,7 +27,7 @@ public class FlashcardController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createCardDeck(@RequestBody FlashcardDeck flashcardDeck,
-                                                 @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -47,7 +47,7 @@ public class FlashcardController {
 
     @PutMapping("/edit")
     public ResponseEntity<String> editCardDeck(@RequestBody FlashcardDeck flashcardDeck,
-                                               @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         String username;
         try {
             username = jwtService.getUsernameFromToken(token.substring(7));
@@ -69,7 +69,7 @@ public class FlashcardController {
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<String> editCardDeck(@PathVariable String uuid,
-                                               @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String username = jwtService.getUsernameFromToken(token.substring(7));
 
@@ -90,7 +90,8 @@ public class FlashcardController {
     }
 
     @GetMapping("/id/{uuid}")
-    public ResponseEntity<ExtendedCarddeckDTO> getCarddeckByUuid(@PathVariable String uuid, @RequestHeader("Authorization") final String token) {
+    public ResponseEntity<ExtendedCarddeckDTO> getCarddeckByUuid(@PathVariable String uuid,
+            @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             ExtendedCarddeckDTO res = flashcardService.getCarddeck(tokenusername, uuid);
@@ -108,7 +109,7 @@ public class FlashcardController {
 
     @GetMapping("/user/{username}")
     public ResponseEntity<ExtendedCarddeckListDTO> getCarddecksFromUser(@PathVariable String username,
-                                                                @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         boolean isAuthorized;
         try {
             isAuthorized = jwtService.checkUsernameCorrespondsWithToken(username, token.substring(7));
@@ -131,7 +132,7 @@ public class FlashcardController {
 
     @PostMapping("/favorite/add/{uuid}")
     public ResponseEntity<String> addFavorite(@PathVariable String uuid,
-                                              @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.addUserFavorites(tokenusername, uuid);
@@ -148,9 +149,9 @@ public class FlashcardController {
         }
     }
 
-    @PostMapping("/favorite/remove/{uuid}")
+    @DeleteMapping("/favorite/remove/{uuid}")
     public ResponseEntity<String> removeFavorite(@PathVariable String uuid,
-                                                 @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.removeUserFavorites(tokenusername, uuid);
@@ -169,7 +170,7 @@ public class FlashcardController {
 
     @PostMapping("/like/add/{uuid}")
     public ResponseEntity<String> addLike(@PathVariable String uuid,
-                                          @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.addUserLikes(tokenusername, uuid);
@@ -185,10 +186,9 @@ public class FlashcardController {
         }
     }
 
-
-    @PostMapping("/like/remove/{uuid}")
+    @DeleteMapping("/like/remove/{uuid}")
     public ResponseEntity<String> removeLike(@PathVariable String uuid,
-                                             @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             String tokenusername = jwtService.getUsernameFromToken(token.substring(7));
             boolean isSuccess = flashcardService.removeUserLikes(tokenusername, uuid);
@@ -206,9 +206,11 @@ public class FlashcardController {
     }
 
     @GetMapping("/all/{from}/{count}/{orderby}")
-    public ResponseEntity<ExtendedCarddeckListDTO> getAll(@PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
+    public ResponseEntity<ExtendedCarddeckListDTO> getAll(@PathVariable String from, @PathVariable String count,
+            @PathVariable String orderby) {
         try {
-            ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count), orderby);
+            ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count),
+                    orderby);
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -220,10 +222,9 @@ public class FlashcardController {
 
     @GetMapping("/userfavorites/{username}")
     public ResponseEntity<ExtendedCarddeckListDTO> getFavoriteCarddecksFromUser(@PathVariable String username,
-                                                                                @RequestHeader("Authorization") final String token) {
+            @RequestHeader("Authorization") final String token) {
         try {
             boolean authorized = jwtService.checkUsernameCorrespondsWithToken(username, token.substring(7));
-
 
             if (authorized) {
                 ExtendedCarddeckListDTO res = flashcardService.getFavoriteUserDecks(username);
@@ -246,10 +247,11 @@ public class FlashcardController {
 
     @GetMapping("/search/{from}/{count}/{orderby}")
     public ResponseEntity<ExtendedCarddeckListDTO> searchCarddecks(@RequestBody CarddeckSearchDTO carddeckSearchDTO,
-                                                                  @PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
+            @PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
 
         try {
-            ExtendedCarddeckListDTO res = flashcardService.searchCarddecks(carddeckSearchDTO, Integer.parseInt(from), Integer.parseInt(count), orderby);
+            ExtendedCarddeckListDTO res = flashcardService.searchCarddecks(carddeckSearchDTO, Integer.parseInt(from),
+                    Integer.parseInt(count), orderby);
             if (res != null) {
                 return new ResponseEntity<>(res, HttpStatus.OK);
             } else {
@@ -260,6 +262,5 @@ public class FlashcardController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }
