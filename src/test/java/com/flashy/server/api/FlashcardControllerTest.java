@@ -16,12 +16,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FlashcardControllerTest extends AbstractTest {
     @Autowired
@@ -33,7 +33,6 @@ public class FlashcardControllerTest extends AbstractTest {
     FlashcardDeck flashcardDeck;
 
     String uuid2;
-
 
     @BeforeAll
     public void setUp() {
@@ -149,7 +148,7 @@ public class FlashcardControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testEditCardDeck() throws Exception{
+    public void testEditCardDeck() throws Exception {
         String uri = "/flashcard/edit";
 
         // save public deck
@@ -212,7 +211,6 @@ public class FlashcardControllerTest extends AbstractTest {
         status = mvcResult.getResponse().getStatus();
         assertEquals(403, status);
 
-
         // edit deck without token
         uri = "/flashcard/edit";
         flashcardDeck.setName(UUID.randomUUID().toString());
@@ -228,7 +226,6 @@ public class FlashcardControllerTest extends AbstractTest {
         // delete deck
         flashcardService.deleteCarddeck(uuid, "admin");
 
-
     }
 
     @Test
@@ -238,9 +235,9 @@ public class FlashcardControllerTest extends AbstractTest {
         flashcardDeck.setIsprivate(0);
         String inputJson = super.mapToJson(flashcardDeck);
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/create")
-                    .header("Authorization", "Bearer " + jwtService.getToken("admin"))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(inputJson)).andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn();
 
         int status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
@@ -249,10 +246,13 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // get deck
         String uri = "/flashcard/id/" + flashcardDeck.getUuid();
-        mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        mvcResult = mvc.perform(
+                MockMvcRequestBuilders.get(uri).header("Authorization", "Bearer " + jwtService.getToken("admin")))
+                .andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        ExtendedCarddeckDTO content1 = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckDTO.class);
+        ExtendedCarddeckDTO content1 = super.mapFromJson(mvcResult.getResponse().getContentAsString(),
+                ExtendedCarddeckDTO.class);
 
         assertEquals(flashcardDeck.getName(), content1.getName());
         assertEquals(flashcardDeck.getCards().size(), content1.getCards().size());
@@ -271,7 +271,7 @@ public class FlashcardControllerTest extends AbstractTest {
 
     @Test
     public void testDeleteDeck() throws Exception {
-// create deck
+        // create deck
         flashcardDeck.setIsprivate(0);
         String inputJson = super.mapToJson(flashcardDeck);
         MvcResult mvcResult = null;
@@ -292,40 +292,30 @@ public class FlashcardControllerTest extends AbstractTest {
         // delete deck with invalid token
         String uri = "/flashcard/delete/" + flashcardDeck.getUuid();
         mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
-                .header("Authorization", "Bearer " + "invalidToken")).
-                andReturn();
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(403, status);
 
         // delete deck with no token
         mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
-                .header("Authorization ", "Bearer ")).
-                andReturn();
+                .header("Authorization ", "Bearer ")).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(400, status);
 
         // delete deck with invalid uuid
 
         mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/delete/" + UUID.randomUUID().toString())
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
-                andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(403, status);
 
-
-
-
         // delete deck with valid token
         mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
-                andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
 
-
-
     }
-
 
     @Test
     public void testGetUserDecks() throws Exception {
@@ -343,11 +333,11 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // get decks
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
-                andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        CarddeckListDTO content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), CarddeckListDTO.class);
+        ExtendedCarddeckListDTO content = super.mapFromJson(mvcResult.getResponse().getContentAsString(),
+                ExtendedCarddeckListDTO.class);
         assertEquals(1, content.getCarddecks().size());
 
         assertEquals(flashcardDeck.getName(), content.getCarddecks().get(0).getName());
@@ -356,11 +346,10 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // with invalid token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + "invalidToken")).
-                andReturn();
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), CarddeckListDTO.class);
+        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
         assertEquals(1, content.getCarddecks().size());
 
         // create private deck
@@ -372,34 +361,29 @@ public class FlashcardControllerTest extends AbstractTest {
                 .content(inputJson)).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-         uuid2 = mvcResult.getResponse().getContentAsString();
+        uuid2 = mvcResult.getResponse().getContentAsString();
 
         // get decks with no token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer ")).
-                andReturn();
+                .header("Authorization", "Bearer ")).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), CarddeckListDTO.class);
+        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
         assertEquals(1, content.getCarddecks().size());
 
         // get decks with valid token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
-                andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), CarddeckListDTO.class);
+        content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
         assertEquals(2, content.getCarddecks().size());
 
         // get with invalid username
-        mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/"+UUID.randomUUID().toString())
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
-                andReturn();
+        mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/" + UUID.randomUUID().toString())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(400, status);
-
-
 
         // delete decks
         flashcardService.deleteCarddeck(uuid, "admin");
@@ -407,17 +391,105 @@ public class FlashcardControllerTest extends AbstractTest {
 
     }
 
+    @Test
+    public void testAddFavorite() throws Exception {
+        // create deck
+        flashcardDeck.setIsprivate(0);
+        String inputJson = super.mapToJson(flashcardDeck);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/create")
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+        String uuid = mvcResult.getResponse().getContentAsString();
+        flashcardDeck.setUuid(uuid);
 
+        // add favorite
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/favorite/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
 
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
 
+        // add favorite with invalid token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/favorite/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // add favorite with no token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/favorite/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer ")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // add favorite with invalid uuid
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/favorite/add/" + UUID.randomUUID().toString())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(400, status);
+
+        // delete decks
+        flashcardService.deleteCarddeck(uuid, "admin");
+
+    }
+
+    @Test
+    public void testRemoveFavorite() throws Exception {
+        // create deck
+        flashcardDeck.setIsprivate(0);
+        String inputJson = super.mapToJson(flashcardDeck);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/create")
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+        String uuid = mvcResult.getResponse().getContentAsString();
+        flashcardDeck.setUuid(uuid);
+
+        // add favorite
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/favorite/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+
+        // remove favorite
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/favorite/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+
+        // remove favorite with invalid token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/favorite/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // remove favorite with no token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/favorite/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer ")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // remove favorite with invalid uuid
+        mvcResult = mvc
+                .perform(MockMvcRequestBuilders.delete("/flashcard/favorite/remove/" + UUID.randomUUID().toString())
+                        .header("Authorization", "Bearer " + jwtService.getToken("admin")))
+                .andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(400, status);
+
+        // delete decks
+        flashcardService.deleteCarddeck(uuid, "admin");
+
+    }
 
     @AfterThrowing
     public void deleteDeck() {
         flashcardService.deleteCarddeck(flashcardDeck.getUuid(), "admin");
         flashcardService.deleteCarddeck(uuid2, "admin");
     }
-
-
-
 
 }

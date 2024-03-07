@@ -15,9 +15,12 @@ import java.util.List;
 @Component
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-
     @Query("SELECT x FROM Comment x WHERE x.carddeckid = :id")
     List<Comment> findAllByCarddeckid(int id);
+
+    @Modifying
+    @Query("DELETE FROM Comment x WHERE x.carddeckid = :carddeckid")
+    void deleteByCarddeckid(int carddeckid);
 
     Comment getFirstByUuid(String uuid);
 

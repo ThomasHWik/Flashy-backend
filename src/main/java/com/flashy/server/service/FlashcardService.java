@@ -43,6 +43,9 @@ public class FlashcardService {
     @Autowired
     private AccessService accessService;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
             flashcardDeck.setCards(flashcardDeck.getCards().stream()
@@ -100,12 +103,17 @@ public class FlashcardService {
 
             List<Extendedcommentview> comments = extendedcommentviewRepository.findAllByCarddeckuuid(deck.getUuid());
 
-            Userhasfavorite isFavorite = userhasfavoriteRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(), deck.getId());
-            Userhaslike isLike = userhaslikeRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(), deck.getId());
+            Userhasfavorite isFavorite = userhasfavoriteRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(),
+                    deck.getId());
+            Userhaslike isLike = userhaslikeRepository.getFirstByFlashyuseridAndCarddeckid(dbuser.getId(),
+                    deck.getId());
 
-            ExtendedCarddeckDTO res = new ExtendedCarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(), deck.getUuid(),
-                    user != null ? user.getUsername() : "", deck.getCardcount(), deck.getLikecount(), deck.getFavoritecount());
-            res.setComments(comments.stream().map(x -> new CommentDTO(x.getComment(), x.getUsername(), x.getCarddeckuuid(), x.getUuid(), x.getCreatedat().toString())).toList());
+            ExtendedCarddeckDTO res = new ExtendedCarddeckDTO(deck.getTitle(), dtocards, deck.getIsprivate(),
+                    deck.getUuid(),
+                    user != null ? user.getUsername() : "", deck.getCardcount(), deck.getLikecount(),
+                    deck.getFavoritecount());
+            res.setComments(comments.stream().map(x -> new CommentDTO(x.getComment(), x.getUsername(),
+                    x.getCarddeckuuid(), x.getUuid(), x.getCreatedat().toString())).toList());
             res.setIsliked(isLike != null ? 1 : 0);
             res.setIsfavorited(isFavorite != null ? 1 : 0);
 
@@ -164,6 +172,9 @@ public class FlashcardService {
 
         if ((dbUser != null && dbDeck != null)
                 && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+            userhasfavoriteRepository.deleteByCarddeckid(dbDeck.getId());
+            userhaslikeRepository.deleteByCarddeckid(dbDeck.getId());
+            commentRepository.deleteByCarddeckid(dbDeck.getId());
             flashcardRepository.deleteByCarddeckid(dbDeck.getId());
             carddeckRepository.deleteById(dbDeck.getId());
             return true;
@@ -175,7 +186,8 @@ public class FlashcardService {
     public boolean addUserFavorites(String username, String uuid) {
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
-        if (dbUser != null && dbDeck != null && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+        if (dbUser != null && dbDeck != null
+                && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
             Userhasfavorite userFavorite = new Userhasfavorite(dbUser.getId(), dbDeck.getId());
             userhasfavoriteRepository.save(userFavorite);
             return true;
@@ -197,7 +209,8 @@ public class FlashcardService {
     public boolean addUserLikes(String username, String uuid) {
         Carddeck dbDeck = carddeckRepository.getFirstByUuid(uuid);
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
-        if (dbUser != null && dbDeck != null && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+        if (dbUser != null && dbDeck != null
+                && (dbDeck.getIsprivate() == 0 || dbDeck.getFlashyuserid() == dbUser.getId())) {
             Userhaslike userLike = new Userhaslike(dbUser.getId(), dbDeck.getId());
             userhaslikeRepository.save(userLike);
             return true;
@@ -248,16 +261,16 @@ public class FlashcardService {
 
         return new ExtendedCarddeckListDTO("", dtoDecks, 0, dtoDecks.size(), from);
 
-
     }
-
 
     public ExtendedCarddeckListDTO getFavoriteUserDecks(String username) {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         if (dbUser != null) {
-            List<Extendedcarddeckview> favoritesDecks = extendedcarddeckviewRepository.getAllFavoritesByFlashyuserId(dbUser.getId());
+            List<Extendedcarddeckview> favoritesDecks = extendedcarddeckviewRepository
+                    .getAllFavoritesByFlashyuserId(dbUser.getId());
             List<ExtendedCarddeckDTO> dtoDecks = favoritesDecks.stream()
-                    .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
+                    .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(),
+                            x.getUsername(),
                             x.getCardcount(), x.getLikecount(), x.getFavoritecount()))
                     .toList();
             return new ExtendedCarddeckListDTO(username, dtoDecks, 0, dtoDecks.size(), 0);
