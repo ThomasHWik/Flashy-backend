@@ -63,9 +63,9 @@ public class FlashcardControllerTest extends AbstractTest {
         assertEquals(200, status);
 
         // get deck
-        CarddeckListDTO decks = flashcardService.getUserDecks("admin", true);
+        ExtendedCarddeckListDTO decks = flashcardService.getUserDecks("admin", true);
         String uuid = null;
-        for (CarddeckDTO deck : decks.getCarddecks()) {
+        for (ExtendedCarddeckDTO deck : decks.getCarddecks()) {
             if (deck.getName().equals(flashcardDeck.getName())) {
                 uuid = deck.getUuid();
                 break;
@@ -103,7 +103,7 @@ public class FlashcardControllerTest extends AbstractTest {
         // get deck
         decks = flashcardService.getUserDecks("admin", true);
         String uuid1 = null;
-        for (CarddeckDTO deck : decks.getCarddecks()) {
+        for (ExtendedCarddeckDTO deck : decks.getCarddecks()) {
             if (deck.getName().equals(flashcardDeck.getName())) {
                 uuid1 = deck.getUuid();
                 break;
@@ -167,9 +167,9 @@ public class FlashcardControllerTest extends AbstractTest {
         assertEquals(200, status);
 
         // get deck
-        CarddeckListDTO decks = flashcardService.getUserDecks("admin", true);
+        ExtendedCarddeckListDTO decks = flashcardService.getUserDecks("admin", true);
         String uuid = null;
-        for (CarddeckDTO deck : decks.getCarddecks()) {
+        for (ExtendedCarddeckDTO deck : decks.getCarddecks()) {
             if (deck.getName().equals(flashcardDeck.getName())) {
                 uuid = deck.getUuid();
                 break;

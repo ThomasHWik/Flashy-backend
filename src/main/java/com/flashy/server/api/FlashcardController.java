@@ -107,7 +107,7 @@ public class FlashcardController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<CarddeckListDTO> getCarddecksFromUser(@PathVariable String username,
+    public ResponseEntity<ExtendedCarddeckListDTO> getCarddecksFromUser(@PathVariable String username,
                                                                 @RequestHeader("Authorization") final String token) {
         boolean isAuthorized;
         try {
@@ -117,7 +117,7 @@ public class FlashcardController {
         }
 
         try {
-            CarddeckListDTO res = flashcardService.getUserDecks(username, isAuthorized);
+            ExtendedCarddeckListDTO res = flashcardService.getUserDecks(username, isAuthorized);
             if (res != null) {
                 return new ResponseEntity<>(res, HttpStatus.OK);
             } else {
@@ -206,7 +206,7 @@ public class FlashcardController {
     }
 
     @GetMapping("/all/{from}/{count}/{orderby}")
-    public ResponseEntity<ExtendedCarddeckListDTO> getLikes(@PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
+    public ResponseEntity<ExtendedCarddeckListDTO> getAll(@PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
         try {
             ExtendedCarddeckListDTO res = flashcardService.getAll(Integer.parseInt(from), Integer.parseInt(count), orderby);
             return new ResponseEntity<>(res, HttpStatus.OK);
@@ -243,4 +243,23 @@ public class FlashcardController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/search/{from}/{count}/{orderby}")
+    public ResponseEntity<ExtendedCarddeckListDTO> searchCarddecks(@RequestBody CarddeckSearchDTO carddeckSearchDTO,
+                                                                  @PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
+
+        try {
+            ExtendedCarddeckListDTO res = flashcardService.searchCarddecks(carddeckSearchDTO, Integer.parseInt(from), Integer.parseInt(count), orderby);
+            if (res != null) {
+                return new ResponseEntity<>(res, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
