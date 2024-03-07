@@ -114,15 +114,18 @@ public class FlashcardService {
         return null;
     }
 
-    public CarddeckListDTO getUserDecks(String username, Boolean isAuthorized) {
+    public ExtendedCarddeckListDTO getUserDecks(String username, Boolean isAuthorized) {
         Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
         if (dbUser != null) {
-            List<Carddeck> storedDecks = isAuthorized
-                    ? carddeckRepository.getAllByFlashyuseridEqualsAndAuthorized(dbUser.getId())
-                    : carddeckRepository.getAllByFlashyuseridEqualsAndNotAuthorized(dbUser.getId());
-            List<CarddeckDTO> dtoDecks = storedDecks.stream()
-                    .map(x -> new CarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), username)).toList();
-            return new CarddeckListDTO(username, dtoDecks, isAuthorized ? 1 : 0);
+            List<Extendedcarddeckview> storedDecks = isAuthorized
+                    ? extendedcarddeckviewRepository.getAllByFlashyuseridEqualsAndAuthorized(dbUser.getId())
+                    : extendedcarddeckviewRepository.getAllByFlashyuseridEqualsAndNotAuthorized(dbUser.getId());
+            List<ExtendedCarddeckDTO> dtoDecks = storedDecks.stream()
+                    .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
+                            x.getCardcount(), x.getLikecount(), x.getFavoritecount())).toList();
+
+
+            return new ExtendedCarddeckListDTO(username, dtoDecks, isAuthorized ? 1 : 0, dtoDecks.size(), 0);
         } else {
             return null;
         }
@@ -217,25 +220,25 @@ public class FlashcardService {
         List<Extendedcarddeckview> decks;
         switch (orderby) {
             case "likeasc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountAsc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountAsc(PageRequest.of(from, count), "").toList();
                 break;
             case "likedesc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountDesc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountDesc(PageRequest.of(from, count), "").toList();
                 break;
             case "favoriteasc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountAsc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountAsc(PageRequest.of(from, count), "").toList();
                 break;
             case "favoritedesc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountDesc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountDesc(PageRequest.of(from, count), "").toList();
                 break;
             case "cardcountasc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountAsc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountAsc(PageRequest.of(from, count), "").toList();
                 break;
             case "cardcountdesc":
-                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountDesc(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountDesc(PageRequest.of(from, count), "").toList();
                 break;
             default:
-                decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count)).toList();
+                decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count), "").toList();
         }
 
         List<ExtendedCarddeckDTO> dtoDecks = decks.stream()
@@ -264,4 +267,39 @@ public class FlashcardService {
     }
 
 
+    public ExtendedCarddeckListDTO searchCarddecks(CarddeckSearchDTO carddeckSearchDTO, int from, int count, String orderby) {
+        List<Extendedcarddeckview> decks;
+        switch (orderby) {
+            case "likeasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountAsc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            case "likedesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyLikecountDesc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            case "favoriteasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountAsc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            case "favoritedesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyFavoritecountDesc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            case "cardcountasc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountAsc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            case "cardcountdesc":
+                decks = extendedcarddeckviewRepository.findAllPublicOrderbyCardcountDesc(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+                break;
+            default:
+                decks = extendedcarddeckviewRepository.findAllPublic(PageRequest.of(from, count), carddeckSearchDTO.getSearchquery()).toList();
+        }
+
+
+
+        List<ExtendedCarddeckDTO> dtoDecks = decks.stream()
+                .map(x -> new ExtendedCarddeckDTO(x.getTitle(), null, x.getIsprivate(), x.getUuid(), x.getUsername(),
+                        x.getCardcount(), x.getLikecount(), x.getFavoritecount()))
+                .toList();
+
+        return new ExtendedCarddeckListDTO("", dtoDecks, 0, dtoDecks.size(), from);
+
+    }
 }
