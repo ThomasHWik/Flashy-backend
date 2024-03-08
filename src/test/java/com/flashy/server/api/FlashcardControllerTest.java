@@ -486,6 +486,97 @@ public class FlashcardControllerTest extends AbstractTest {
 
     }
 
+    @Test
+    public void testAddLike() throws Exception {
+        // create deck
+        flashcardDeck.setIsprivate(0);
+        String inputJson = super.mapToJson(flashcardDeck);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/create")
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+        String uuid = mvcResult.getResponse().getContentAsString();
+        flashcardDeck.setUuid(uuid);
+
+        // add like
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/like/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+
+        // add like with invalid token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/like/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // add like with no token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/like/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer ")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // add like with invalid uuid
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/like/add/" + UUID.randomUUID().toString())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(400, status);
+
+        // delete decks
+        flashcardService.deleteCarddeck(uuid, "admin");
+    }
+
+    @Test
+    public void testRemoveLike() throws Exception {
+        // create deck
+        flashcardDeck.setIsprivate(0);
+        String inputJson = super.mapToJson(flashcardDeck);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/create")
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)).andReturn();
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+        String uuid = mvcResult.getResponse().getContentAsString();
+        flashcardDeck.setUuid(uuid);
+
+        // add like
+        mvcResult = mvc.perform(MockMvcRequestBuilders.post("/flashcard/like/add/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+
+        // remove like
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/like/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+
+        // remove like with invalid token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/like/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // remove like with no token
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/like/remove/" + flashcardDeck.getUuid())
+                .header("Authorization", "Bearer ")).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(403, status);
+
+        // remove like with invalid uuid
+        mvcResult = mvc.perform(MockMvcRequestBuilders.delete("/flashcard/like/remove/" + UUID.randomUUID().toString())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        status = mvcResult.getResponse().getStatus();
+        assertEquals(400, status);
+
+        // delete decks
+        flashcardService.deleteCarddeck(uuid, "admin");
+
+    }
+
     @AfterThrowing
     public void deleteDeck() {
         flashcardService.deleteCarddeck(flashcardDeck.getUuid(), "admin");
