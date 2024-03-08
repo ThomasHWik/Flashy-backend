@@ -18,6 +18,8 @@ public class CarddeckDTO {
     private int isprivate;
     private String username;
 
+    private List<String> tags;
+
     public CarddeckDTO() {
 
     }

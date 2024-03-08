@@ -16,12 +16,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FlashcardControllerTest extends AbstractTest {
     @Autowired
@@ -33,6 +33,7 @@ public class FlashcardControllerTest extends AbstractTest {
     FlashcardDeck flashcardDeck;
 
     String uuid2;
+
 
     @BeforeAll
     public void setUp() {
@@ -315,7 +316,10 @@ public class FlashcardControllerTest extends AbstractTest {
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
 
+
+
     }
+
 
     @Test
     public void testGetUserDecks() throws Exception {
@@ -333,7 +337,8 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // get decks
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
+                andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
         ExtendedCarddeckListDTO content = super.mapFromJson(mvcResult.getResponse().getContentAsString(),
@@ -346,7 +351,8 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // with invalid token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + "invalidToken")).andReturn();
+                .header("Authorization", "Bearer " + "invalidToken")).
+                andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
         content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
@@ -361,11 +367,12 @@ public class FlashcardControllerTest extends AbstractTest {
                 .content(inputJson)).andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
-        uuid2 = mvcResult.getResponse().getContentAsString();
+         uuid2 = mvcResult.getResponse().getContentAsString();
 
         // get decks with no token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer ")).andReturn();
+                .header("Authorization", "Bearer ")).
+                andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
         content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
@@ -373,17 +380,21 @@ public class FlashcardControllerTest extends AbstractTest {
 
         // get decks with valid token
         mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/admin")
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
+                andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(200, status);
         content = super.mapFromJson(mvcResult.getResponse().getContentAsString(), ExtendedCarddeckListDTO.class);
         assertEquals(2, content.getCarddecks().size());
 
         // get with invalid username
-        mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/" + UUID.randomUUID().toString())
-                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).andReturn();
+        mvcResult = mvc.perform(MockMvcRequestBuilders.get("/flashcard/user/"+UUID.randomUUID())
+                .header("Authorization", "Bearer " + jwtService.getToken("admin"))).
+                andReturn();
         status = mvcResult.getResponse().getStatus();
         assertEquals(400, status);
+
+
 
         // delete decks
         flashcardService.deleteCarddeck(uuid, "admin");
@@ -582,5 +593,4 @@ public class FlashcardControllerTest extends AbstractTest {
         flashcardService.deleteCarddeck(flashcardDeck.getUuid(), "admin");
         flashcardService.deleteCarddeck(uuid2, "admin");
     }
-
 }

@@ -12,6 +12,7 @@ import java.util.Collections;
 public class FlashcardDeck {
 
 
+    private List<String> tags;
     private String name;
     private List<FlashcardDTO> cards;
     private String uuid;
@@ -26,6 +27,7 @@ public class FlashcardDeck {
     public FlashcardDeck(String name) {
         this.name = name;
         this.cards = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
     public FlashcardDeck (String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username) {
         this.name = name;
@@ -34,6 +36,8 @@ public class FlashcardDeck {
         this.isprivate = isprivate;
         this.username = username;
         this.cards = new ArrayList<>();
+        this.tags = new ArrayList<>();
+
     }
 
 
@@ -41,6 +45,8 @@ public class FlashcardDeck {
         this.name = name;
         this.cards = cards;
         this.isprivate = isprivate;
+        this.cards = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
 

@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -23,23 +24,25 @@ public interface ExtendedcarddeckviewRepository extends JpaRepository<Extendedca
 
     Extendedcarddeckview getFirstByUuid(String uuid);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE %:searchquery% ORDER BY x.likecount DESC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyLikecountDesc(Pageable pageable, String searchquery);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE %:searchquery% ORDER BY x.favoritecount DESC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyFavoritecountDesc(Pageable pageable, String searchquery);
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY favoritecount DESC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyFavoritecountDesc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE %:searchquery%  ORDER BY x.cardcount DESC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyCardcountDesc(Pageable pageable, String searchquery);
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY cardcount DESC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyCardcountDesc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE %:searchquery%  ORDER BY x.likecount ASC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyLikecountAsc(Pageable pageable, String searchquery);
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY likecount DESC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyLikecountDesc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE %:searchquery%  ORDER BY x.favoritecount ASC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyFavoritecountAsc(Pageable pageable, String searchquery);
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY favoritecount ASC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyFavoritecountAsc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
 
-    @Query("SELECT x FROM Extendedcarddeckview x WHERE x.isprivate = 0 AND x.title LIKE '%:searchquery%'  ORDER BY x.cardcount ASC")
-    Page<Extendedcarddeckview> findAllPublicOrderbyCardcountAsc(Pageable pageable, String searchquery);
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY cardcount ASC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyCardcountAsc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
+
+    @Query(value = "SELECT * FROM extendedcarddeckview WHERE isprivate = 0 AND title LIKE %:searchquery% AND :tagcount = (SELECT COUNT(DISTINCT value) FROM STRING_SPLIT(taglist, \',\') WHERE value IN :tags) ORDER BY likecount ASC", nativeQuery = true)
+    Page<Extendedcarddeckview> findAllPublicOrderbyLikecountAsc(Pageable pageable, @Param("searchquery") String searchquery, @Param("tags") List<String> tags, @Param("tagcount") long tagcount);
+
 
     @Query("SELECT x FROM Extendedcarddeckview x WHERE x.id IN (SELECT y.carddeckid FROM Userhasfavorite y WHERE y.flashyuserid = :id)")
     List<Extendedcarddeckview> getAllFavoritesByFlashyuserId(long id);

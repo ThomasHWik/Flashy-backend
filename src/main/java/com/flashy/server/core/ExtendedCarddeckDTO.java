@@ -25,11 +25,13 @@ public class ExtendedCarddeckDTO {
     private int isfavorited;
     private int isliked;
 
+    private List<String> tags;
+
 
     public ExtendedCarddeckDTO() {
 
     }
-    public ExtendedCarddeckDTO(String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username, long cardcount, long likecount, long favoritecount) {
+    public ExtendedCarddeckDTO(String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username, long cardcount, long likecount, long favoritecount, List<String> tags) {
         this.name = name;
         this.cards = cards;
         this.uuid = uuid;
@@ -38,6 +40,7 @@ public class ExtendedCarddeckDTO {
         this.cardcount = cardcount;
         this.likecount = likecount;
         this.favoritecount = favoritecount;
+        this.tags = tags;
 
     }
 }
