@@ -120,9 +120,6 @@ public class FlashyuserService {
         if (newuserinfo.getUsername() == null || newuserinfo.getUsername().isEmpty()) {
             System.out.println(0);
             throw new InvalidLoginException();
-        } else if (newuserinfo.getPassword() == null || newuserinfo.getPassword().isEmpty()) {
-            System.out.println(1);
-            throw new InvalidLoginException();
         }
 
 
@@ -131,12 +128,14 @@ public class FlashyuserService {
             Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
             if (dbUser != null) {
                 Flashyuser usernameTaken = flashyuserRepository.getFirstByUsername(newuserinfo.getUsername());
-                if (usernameTaken != null) {
+                if (usernameTaken != null && !usernameTaken.getUsername().equals(username)) {
                     throw new InvalidLoginException();
                 }
 
                 dbUser.setUsername(newuserinfo.getUsername());
-                dbUser.setPassword(hashingService.hashPassword(newuserinfo.getPassword()));
+                if (newuserinfo.getPassword() != null && !newuserinfo.getPassword().isEmpty()) {
+                    dbUser.setPassword(hashingService.hashPassword(newuserinfo.getPassword()));
+                }
                 flashyuserRepository.save(dbUser);
                 return new LoginResponseDTO("", dbUser.getIsadmin());
             } else {
