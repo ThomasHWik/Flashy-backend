@@ -13,7 +13,9 @@ CREATE TABLE carddeck
     uuid      VARCHAR(36) NOT NULL UNIQUE,
     title     VARCHAR(55) NOT NULL,
     isprivate BIT         NOT NULL,
+    iseditable BIT         NOT NULL,
     flashyuserid   INT         NOT NULL,
+
     CONSTRAINT fk_flashyuserid FOREIGN KEY (flashyuserid) REFERENCES flashyuser (id) ON DELETE CASCADE
 )
 
