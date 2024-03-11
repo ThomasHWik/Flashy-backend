@@ -17,6 +17,7 @@ public class CarddeckDTO {
     private String uuid;
     private int isprivate;
     private String username;
+    private int iseditable;
 
     private List<String> tags;
 

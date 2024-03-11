@@ -26,10 +26,13 @@ public class Carddeck {
     @NotBlank
     private int flashyuserid;
 
+    @NotBlank
+    private int iseditable;
 
     public Carddeck() {
 
     }
+
     public Carddeck(int id, String uuid, String title, int isprivate, int flashyuserid) {
         this.id = id;
         this.uuid = uuid;
@@ -38,10 +41,11 @@ public class Carddeck {
         this.flashyuserid = flashyuserid;
     }
 
-    public Carddeck(String uuid, String title, int isprivate, int flashyuserid) {
+    public Carddeck(String uuid, String title, int isprivate, int flashyuserid, int iseditable) {
         this.uuid = uuid;
         this.title = title;
         this.isprivate = isprivate;
         this.flashyuserid = flashyuserid;
+        this.iseditable = iseditable;
     }
 }

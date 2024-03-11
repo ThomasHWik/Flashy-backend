@@ -2,6 +2,7 @@ package com.flashy.server.data.dataviews;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Entity
@@ -28,6 +29,8 @@ public class Extendedcarddeckview {
     private long favoritecount;
 
     private String taglist;
+
+    private int iseditable;
 
 
 
