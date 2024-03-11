@@ -245,7 +245,7 @@ public class FlashcardController {
         }
     }
 
-    @GetMapping("/search/{from}/{count}/{orderby}")
+    @PostMapping("/search/{from}/{count}/{orderby}")
     public ResponseEntity<ExtendedCarddeckListDTO> searchCarddecks(@RequestBody CarddeckSearchDTO carddeckSearchDTO,
             @PathVariable String from, @PathVariable String count, @PathVariable String orderby) {
 
