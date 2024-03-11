@@ -103,7 +103,7 @@ public class FlashcardService {
             return null;
         } else if (!flashcardDeck.getName().isEmpty()) {
             Carddeck deck = carddeckRepository.save(new Carddeck(UUID.randomUUID().toString(), flashcardDeck.getName(),
-                    flashcardDeck.getIsprivate(), user.getId()));
+                    flashcardDeck.getIsprivate(), user.getId(), flashcardDeck.getIseditable()));
 
             boolean success = createFlashcards(flashcardDeck, deck.getId()) && createTags(flashcardDeck.getTags(), deck.getId());
             if (!success) {
@@ -173,10 +173,13 @@ public class FlashcardService {
 
             return false;
         }
-
+        if (dbUser == null || ((dbDeck.getIsprivate() == 0 && dbDeck.getIseditable() == 0 ) && dbDeck.getFlashyuserid() != dbUser.getId() && dbUser.getIsadmin() != 1)) {
+            return false;
+        }
         dbDeck.setTitle(flashcardDeck.getName());
         if (dbUser != null && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuserid() == dbUser.getId())) {
             dbDeck.setIsprivate(flashcardDeck.getIsprivate());
+            dbDeck.setIseditable(flashcardDeck.getIseditable());
         } else if (dbDeck.getIsprivate() == 1) {
             // return false only if the deck is private and is being edited by a person not
             // owner or admin

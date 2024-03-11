@@ -18,6 +18,7 @@ public class FlashcardDeck {
     private String uuid;
     private int isprivate;
     private String username;
+    private int iseditable;
 
     public FlashcardDeck() {
         this.cards = new ArrayList<>();
