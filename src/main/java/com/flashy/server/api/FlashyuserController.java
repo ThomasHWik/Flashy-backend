@@ -9,6 +9,7 @@ import com.flashy.server.exceptions.InvalidLoginException;
 import com.flashy.server.service.FlashcardService;
 import com.flashy.server.service.FlashyuserService;
 import com.flashy.server.service.JWTService;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -94,23 +95,24 @@ public class FlashyuserController {
     }
 
 
-    @PutMapping("/changepassword")
-    public ResponseEntity<String> changePassword(@RequestHeader("Authorization") final String token, @RequestBody UserDTO user) {
+    @PutMapping("/change/{username}")
+    public ResponseEntity<LoginResponseDTO> changePassword(@PathVariable("username") String username, @RequestHeader("Authorization") final String token, @RequestBody UserDTO user) {
         try {
-            String username = jwtService.getUsernameFromToken(token.substring(7));
-            boolean success = flashyuserService.changePassword(user, username);
-            if (success) {
-                return new ResponseEntity<>("Success", HttpStatus.OK);
+            String requestingusername = jwtService.getUsernameFromToken(token.substring(7));
+            LoginResponseDTO res = flashyuserService.changeUser(user, username, requestingusername);
+            if (res != null) {
+                res.setMessage(jwtService.getToken(user.getUsername()));
+                return new ResponseEntity<>(res, HttpStatus.OK);
             } else {
-                return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
             }
         } catch (JWTVerificationException e) {
-            return new ResponseEntity<>("Invalid credentials", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }  catch (InvalidLoginException e) {
-            return new ResponseEntity<>("Invalid username", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         catch (Exception e) {
-            return new ResponseEntity<>("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

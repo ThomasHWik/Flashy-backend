@@ -1,5 +1,6 @@
 package com.flashy.server.service;
 
+import com.flashy.server.core.LoginResponseDTO;
 import com.flashy.server.core.User;
 import com.flashy.server.core.UserDTO;
 import com.flashy.server.data.Carddeck;
@@ -86,6 +87,16 @@ public class FlashyuserService {
 
     }
 
+
+    public List<String> getAllAdmins(String username) {
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(username);
+        if (requestingUser != null && requestingUser.getIsadmin() == 1) {
+            return flashyuserRepository.findWhereIsAdmin().stream().map(x -> x.getUsername()).toList();
+        } else {
+            return null;
+        }
+    }
+
     @Transactional
     public boolean changePassword(UserDTO user, String tokenusername) throws InvalidLoginException {
         Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
@@ -103,15 +114,37 @@ public class FlashyuserService {
         }
     }
 
-    public List<String> getAllAdmins(String username) {
-        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(username);
-        if (requestingUser != null && requestingUser.getIsadmin() == 1) {
-            return flashyuserRepository.findWhereIsAdmin().stream().map(x -> x.getUsername()).toList();
+
+
+    public LoginResponseDTO changeUser(UserDTO newuserinfo, String username, String requestingusername) throws InvalidLoginException{
+        if (newuserinfo.getUsername() == null || newuserinfo.getUsername().isEmpty()) {
+            System.out.println(0);
+            throw new InvalidLoginException();
+        } else if (newuserinfo.getPassword() == null || newuserinfo.getPassword().isEmpty()) {
+            System.out.println(1);
+            throw new InvalidLoginException();
+        }
+
+
+        Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(requestingusername);
+        if (requestingUser != null && (requestingUser.getIsadmin() == 1 || requestingUser.getUsername().equals(username))) {
+            Flashyuser dbUser = flashyuserRepository.getFirstByUsername(username);
+            if (dbUser != null) {
+                Flashyuser usernameTaken = flashyuserRepository.getFirstByUsername(newuserinfo.getUsername());
+                if (usernameTaken != null) {
+                    throw new InvalidLoginException();
+                }
+
+                dbUser.setUsername(newuserinfo.getUsername());
+                dbUser.setPassword(hashingService.hashPassword(newuserinfo.getPassword()));
+                flashyuserRepository.save(dbUser);
+                return new LoginResponseDTO("", dbUser.getIsadmin());
+            } else {
+                System.out.println(2);
+                throw new InvalidLoginException();
+            }
         } else {
             return null;
         }
     }
-
-
-
 }
