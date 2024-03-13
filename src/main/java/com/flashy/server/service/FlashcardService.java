@@ -140,6 +140,7 @@ public class FlashcardService {
             res.setComments(comments.stream().map(x -> new CommentDTO(x.getComment(), x.getUsername(), x.getCarddeckuuid(), x.getUuid(), x.getCreatedat().toString())).toList());
             res.setIsliked(isLike != null ? 1 : 0);
             res.setIsfavorited(isFavorite != null ? 1 : 0);
+            res.setIseditable(deck.getIseditable());
 
             return res;
         }
