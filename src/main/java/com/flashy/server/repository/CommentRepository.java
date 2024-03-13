@@ -24,4 +24,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     Comment getFirstByUuid(String uuid);
 
+    @Modifying
+    @Query("DELETE FROM Comment x WHERE x.flashyuserid = :id")
+    void deleteByFlashyuserid(int id);
 }
