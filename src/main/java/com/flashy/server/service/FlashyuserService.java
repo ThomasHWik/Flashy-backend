@@ -5,10 +5,10 @@ import com.flashy.server.core.User;
 import com.flashy.server.core.UserDTO;
 import com.flashy.server.data.Carddeck;
 import com.flashy.server.data.Flashyuser;
+import com.flashy.server.data.Userhasfavorite;
+import com.flashy.server.data.Userhaslike;
 import com.flashy.server.exceptions.InvalidLoginException;
-import com.flashy.server.repository.CarddeckRepository;
-import com.flashy.server.repository.FlashcardRepository;
-import com.flashy.server.repository.FlashyuserRepository;
+import com.flashy.server.repository.*;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,15 @@ public class FlashyuserService {
 
     @Autowired
     CarddeckRepository carddeckRepository;
+
+    @Autowired
+    UserhasfavoriteRepository userhasfavoriteRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
+
+    @Autowired
+    UserhaslikeRepository userhaslikeRepository;
 
     HashingService hashingService = new HashingService();
 
@@ -73,6 +82,9 @@ public class FlashyuserService {
         Flashyuser requestingUser = flashyuserRepository.getFirstByUsername(tokenusername);
         Flashyuser deletedUser = flashyuserRepository.getFirstByUsername(username);
         if (requestingUser != null && deletedUser != null && (requestingUser.getIsadmin() == 1 || username.equals(tokenusername))) {
+            userhaslikeRepository.deleteByFlashyuserid(deletedUser.getId());
+            userhasfavoriteRepository.deleteByFlashyuserid(deletedUser.getId());
+            commentRepository.deleteByFlashyuserid(deletedUser.getId());
             List<Carddeck> decks = carddeckRepository.getAllByFlashyuseridEqualsAndAuthorized(deletedUser.getId());
             for (Carddeck d : decks) {
                 flashcardRepository.deleteByCarddeckid(d.getId());
