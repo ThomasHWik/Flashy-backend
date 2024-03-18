@@ -8,11 +8,15 @@ import com.flashy.server.repository.*;
 
 import com.flashy.server.repository.views.ExtendedcarddeckviewRepository;
 import com.flashy.server.repository.views.ExtendedcommentviewRepository;
+import com.sun.tools.jconsole.JConsoleContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,13 +56,14 @@ public class FlashcardService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private ImageService imageService;
+
+
+
 
     private boolean createFlashcards(FlashcardDeck flashcardDeck, int carddeckId) {
         try {
-            flashcardDeck.setCards(flashcardDeck.getCards().stream()
-                    .filter(x -> (x.getQuestion() == null || !x.getQuestion().isEmpty())
-                            && (x.getQuestion() == null || !x.getAnswer().isEmpty()))
-                    .toList());
 
             for (FlashcardDTO f : flashcardDeck.getCards()) {
                 if (f.getQuestion() == null) {
@@ -69,9 +74,32 @@ public class FlashcardService {
                 }
             }
 
-            flashcardRepository.saveAll(flashcardDeck.getCards().stream()
-                    .map(x -> new Flashcard(x.getQuestion(), x.getAnswer(), UUID.randomUUID().toString(), carddeckId))
-                    .toList());
+            List<Flashcard> cards = new ArrayList<>();
+
+            for (FlashcardDTO f : flashcardDeck.getCards()) {
+                if (f.getQuestion() == null) {
+                    f.setQuestion("");
+                } else if (f.getAnswer() == null) {
+                    f.setAnswer("");
+                }
+                String uuid = UUID.randomUUID().toString();
+                Flashcard card = new Flashcard(f.getQuestion(), f.getAnswer(), uuid, carddeckId);
+                if (f.getImagequestion() != null) {
+                    imageService.uploadBlob(uuid + "__q", f.getImagequestion().getBytes());
+                    card.setImagequestion(uuid + "__q");
+                }
+                if (f.getImageanswer() != null) {
+                    imageService.uploadBlob(uuid + "__a", f.getImageanswer().getBytes());
+                    card.setImageanswer(uuid + "__a");
+                }
+
+                cards.add(card);
+            }
+
+
+
+            flashcardRepository.saveAll(cards);
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,6 +123,21 @@ public class FlashcardService {
         }
     }
 
+    public void deleteImages(int carddeckId) {
+        List<Flashcard> cards = flashcardRepository.findAllByCarddeckid(carddeckId);
+        for (Flashcard f : cards) {
+            if (f.getImagequestion() != null && !f.getImagequestion().isBlank()) {
+                imageService.deleteBlob(f.getImagequestion());
+            }
+            if (f.getImageanswer() != null && !f.getImageanswer().isBlank()) {
+                imageService.deleteBlob(f.getImageanswer());
+            }
+
+        }
+
+
+    }
+
 
     public String createCarddeck(FlashcardDeck flashcardDeck, String username) {
 
@@ -111,9 +154,6 @@ public class FlashcardService {
                 return null;
             }
 
-            System.out.println(carddeckhastagRepository.findCarddeckIdsByTags(List.of(2, 1), 2));
-            System.out.println(carddeckhastagRepository.findCarddeckIdsByTags(List.of(2, 1), 2).size());
-
 
             return deck.getUuid();
         } else {
@@ -127,7 +167,7 @@ public class FlashcardService {
         if (deck != null && dbuser != null && accessService.hasCarddeckViewAccess(dbuser, deck)) {
             List<Flashcard> cards = flashcardRepository.findAllByCarddeckid(deck.getId());
             List<FlashcardDTO> dtocards = cards.stream()
-                    .map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid())).toList();
+                    .map(x -> new FlashcardDTO(x.getQuestion(), x.getAnswer(), x.getUuid(), x.getImagequestion(), x.getImageanswer())).toList();
             Flashyuser user = flashyuserRepository.getById(deck.getFlashyuserid());
 
             List<Extendedcommentview> comments = extendedcommentviewRepository.findAllByCarddeckuuid(deck.getUuid());
@@ -188,7 +228,7 @@ public class FlashcardService {
         }
 
         carddeckRepository.save(dbDeck);
-
+        deleteImages(dbDeck.getId());
         flashcardRepository.deleteByCarddeckid(dbDeck.getId());
         carddeckhastagRepository.deleteByCarddeckid(dbDeck.getId());
 
@@ -202,6 +242,7 @@ public class FlashcardService {
 
         if ((dbUser != null && dbDeck != null)
                 && (dbUser.getIsadmin() == 1 || dbDeck.getFlashyuserid() == dbUser.getId())) {
+            deleteImages(dbDeck.getId());
             flashcardRepository.deleteByCarddeckid(dbDeck.getId());
             userhasfavoriteRepository.deleteByCarddeckid(dbDeck.getId());
             userhaslikeRepository.deleteByCarddeckid(dbDeck.getId());

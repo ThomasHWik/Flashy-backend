@@ -3,6 +3,7 @@ package com.flashy.server.core;
 
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Collections;

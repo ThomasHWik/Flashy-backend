@@ -27,6 +27,10 @@ public class Flashcard {
     @NotBlank
     private String uuid;
 
+    private String imagequestion;
+
+    private String imageanswer;
+
 
     public Flashcard(int id, String question, String answer, int carddeckid, String uuid) {
         this.question = question;

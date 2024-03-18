@@ -27,6 +27,8 @@ CREATE TABLE flashcard
     question    VARCHAR(255) NOT NULL,
     answer      VARCHAR(255) NOT NULL,
     carddeckid INT          NOT NULL,
+    imagequestion VARCHAR(40),
+    imageanswer VARCHAR(40),
     CONSTRAINT fk_carddeckid FOREIGN KEY (carddeckid) REFERENCES carddeck (id) ON DELETE CASCADE
 
 )
