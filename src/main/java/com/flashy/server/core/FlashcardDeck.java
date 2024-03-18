@@ -2,10 +2,9 @@ package com.flashy.server.core;
 
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Collections;
+import java.util.*;
 
 
 @Data
@@ -22,6 +21,8 @@ public class FlashcardDeck {
 
     public FlashcardDeck() {
         this.cards = new ArrayList<>();
+        this.tags = new ArrayList<>();
+
     }
 
 
@@ -29,6 +30,7 @@ public class FlashcardDeck {
         this.name = name;
         this.cards = new ArrayList<>();
         this.tags = new ArrayList<>();
+
     }
     public FlashcardDeck (String name, List<FlashcardDTO> cards, int isprivate, String uuid, String username) {
         this.name = name;
