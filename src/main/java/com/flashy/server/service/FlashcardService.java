@@ -246,6 +246,7 @@ public class FlashcardService {
             flashcardRepository.deleteByCarddeckid(dbDeck.getId());
             userhasfavoriteRepository.deleteByCarddeckid(dbDeck.getId());
             userhaslikeRepository.deleteByCarddeckid(dbDeck.getId());
+            commentRepository.deleteByCarddeckid(dbDeck.getId());
             carddeckRepository.deleteById(dbDeck.getId());
 
             return true;
